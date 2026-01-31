@@ -1,0 +1,14 @@
+{
+  "ui": {
+    "runButton": "Code ausführen",
+    "nextLevel": "Nächstes Level",
+    "loading": "Laden..."
+  },
+  "levels": {
+    "1": {
+      "title": "Einführung in Java",
+      "theory": "Java ist eine objektorientierte Sprache...",
+      "task": "Drucke 'Hallo Welt' auf den Bildschirm."
+    }
+  }
+}
