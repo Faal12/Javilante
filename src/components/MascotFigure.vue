@@ -59,8 +59,7 @@ defineProps({
   height: 100%;
   overflow: hidden;
   position: relative;
-  left: -10%;
-  clip-path: inset(0 15% 0 0%);
+  clip-path: inset(0 0% 0 4%);
 }
 
 /* 2. Лента с кадрами */
@@ -76,13 +75,13 @@ defineProps({
      5 кадров = 500%
      4 кадра = 400%
   */
-  width: 500%; 
+  width: 600%; 
   
   /* СКОРОСТЬ:
      steps(5) — должно быть РОВНО количество ваших кадров.
      0.6s — скорость цикла (меньше = быстрее бежит).
   */
-  animation: moveStrip 0.6s steps(5) infinite;
+  animation: moveStrip 1.0s steps(6) infinite;
 }
 
 @keyframes moveStrip {

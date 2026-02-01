@@ -36,7 +36,7 @@
       @mousemove="onDrag" @touchmove="onDrag"
       @mouseup="stopDrag" @touchend="stopDrag"
       @mouseleave="stopDrag"
-      :style="{ transform: `translate(${pX}px, ${pY}px)` }"
+      :style="{ transform: `translate(${pX}px, ${pY}px) scale(${scale})` }"
     >
       <div class="world-bg"></div>
 
@@ -111,8 +111,10 @@ const MAP_HEIGHT = 1792;
 const viewportRef = ref(null); 
 const worldRef = ref(null);
 
-const pX = ref(store.cameraPos.x);
-const pY = ref(store.cameraPos.y);
+// Координаты камеры
+const pX = ref(0);
+const pY = ref(0);
+const scale = ref(1); // Масштаб для "зума"
 
 const isPandaWalking = ref(false);
 const targetLevelId = ref(null);
@@ -121,17 +123,75 @@ const pandaVisX = ref(0);
 const pandaVisY = ref(0);
 
 // --- НАСТРОЙКИ КООРДИНАТ ---
-// Платформа (центр): (level.x + 50, level.y + 35)
-// Маскот (контейнер): ширина 80px, высота 110px.
-
-// Центруем по X: 50 (центр платф) - 40 (половина панды) = +10
 const OFFSET_X = -20; 
-
-// Ставим на платформу по Y:
-// Низ панды должен быть примерно на level.y + 20 (верхняя грань платформы)
-// top = (level.y + 20) - 110 (высота панды) = level.y - 90
 const OFFSET_Y = -160;
 
+// === РАСЧЕТ МАСШТАБА И ГРАНИЦ ===
+const updateLayout = () => {
+  if (!viewportRef.value) return;
+  const vw = viewportRef.value.clientWidth;
+  
+  // Адаптивный зум:
+  // На больших экранах (1920px) масштаб ~1.0
+  // На мобильных (400px) масштаб ~0.5 (чтобы видеть больше карты, а не один пиксель)
+  // Ограничиваем минимум 0.5, максимум 1.0
+  scale.value = Math.min(Math.max(vw / 1600, 0.5), 1.0);
+
+  clampCamera();
+};
+
+const clampCamera = () => {
+  if (!viewportRef.value) return;
+  const vw = viewportRef.value.clientWidth;
+  const vh = viewportRef.value.clientHeight;
+  
+  // Реальные размеры карты с учетом масштаба
+  const scaledMapW = MAP_WIDTH * scale.value;
+  const scaledMapH = MAP_HEIGHT * scale.value;
+
+  // Если карта меньше экрана (по ширине), центрируем её
+  if (scaledMapW < vw) {
+    pX.value = (vw - scaledMapW) / 2;
+  } else {
+    // Иначе не даем уйти за границы (стандартный clamp)
+    // max X = 0, min X = vw - scaledMapW
+    pX.value = Math.min(0, Math.max(pX.value, vw - scaledMapW));
+  }
+
+  // Аналогично для высоты
+  if (scaledMapH < vh) {
+    pY.value = (vh - scaledMapH) / 2;
+  } else {
+    pY.value = Math.min(0, Math.max(pY.value, vh - scaledMapH));
+  }
+};
+
+const centerOnActiveLevel = () => {
+  // Находим текущий уровень (последний открытый)
+  const levelId = store.currentLevelId;
+  const level = store.levels.find(l => l.id === levelId) || store.levels[0];
+  
+  if (!viewportRef.value || !level) return;
+
+  const vw = viewportRef.value.clientWidth;
+  const vh = viewportRef.value.clientHeight;
+
+  // Координаты центра уровня на карте (без масштаба)
+  const targetX = level.x + 50; 
+  const targetY = level.y + 35;
+
+  // Формула центрирования: Половина экрана - (Координата * Масштаб)
+  pX.value = (vw / 2) - (targetX * scale.value);
+  pY.value = (vh / 2) - (targetY * scale.value);
+
+  // Применяем границы, чтобы не показать пустоту
+  clampCamera();
+  
+  // Сохраняем в стор
+  store.setCamera(pX.value, pY.value);
+};
+
+// === ПАНДА ===
 const updatePandaCoords = (level) => {
   pandaVisX.value = level.x + OFFSET_X;
   pandaVisY.value = level.y + OFFSET_Y;
@@ -146,69 +206,47 @@ const initPanda = () => {
 const pandaStyle = computed(() => ({
   left: pandaVisX.value + 'px',
   top: pandaVisY.value + 'px',
-  // Если идет - плавная анимация (1 сек), если нет - мгновенно (для ресайза)
   transition: isPandaWalking.value ? 'all 1.0s linear' : 'none',
   zIndex: 100 
 }));
 
 const handleNodeClick = (level) => {
-  // Если панда уже идет, игнорируем клики
   if (isPandaWalking.value) return;
 
-  // Если кликнули туда, где мы уже стоим
   const isAtTarget = Math.abs((level.x + OFFSET_X) - pandaVisX.value) < 1 && 
                      Math.abs((level.y + OFFSET_Y) - pandaVisY.value) < 1;
 
   if (isAtTarget) {
-    // Пытаемся войти
     checkAndEnterLevel(level);
   } else {
-    // ИДЕМ ТУДА (даже если уровень закрыт)
     targetLevelId.value = level.id;
     isPandaWalking.value = true;
     updatePandaCoords(level);
   }
 };
 
-// Вызывается автоматически, когда панда дошла (CSS transition end)
 const onMovementEnd = () => {
   if (!isPandaWalking.value) return;
-  
-  // Останавливаемся (включается анимация дыхания)
   isPandaWalking.value = false;
-  
-  // Проверяем, можно ли войти
   const level = store.levels.find(l => l.id === targetLevelId.value);
   if (level) checkAndEnterLevel(level);
 };
 
 const checkAndEnterLevel = (level) => {
   if (level.unlocked) {
-    // Небольшая пауза перед входом, чтобы игрок увидел, что панда остановилась
     setTimeout(() => {
         store.setCamera(pX.value, pY.value);
         router.push(`/level/${level.id}`);
     }, 200);
   } else {
-    // Если закрыто - показываем сообщение
     lockedMessage.value = "Level gesperrt! 🔒";
     setTimeout(() => lockedMessage.value = "", 2000);
   }
 };
 
-// --- DRAG LOGIC ---
+// === DRAG LOGIC ===
 let isDragging = false;
 let startX = 0, startY = 0, initialPX = 0, initialPY = 0;
-
-const getClampedCoords = (x, y) => {
-  if (!viewportRef.value) return { x, y };
-  const screenW = viewportRef.value.clientWidth;
-  const screenH = viewportRef.value.clientHeight;
-  return { 
-    x: Math.max(screenW - MAP_WIDTH, Math.min(x, 0)),
-    y: Math.max(screenH - MAP_HEIGHT, Math.min(y, 0))
-  };
-};
 
 const startDrag = (e) => {
   if (e.type === 'mousedown' && e.button !== 0) return;
@@ -223,8 +261,13 @@ const onDrag = (e) => {
   if (!isDragging) return;
   if(e.cancelable) e.preventDefault();
   const c = e.touches ? e.touches[0] : e;
-  const clamped = getClampedCoords(initialPX + (c.clientX - startX), initialPY + (c.clientY - startY));
-  pX.value = clamped.x; pY.value = clamped.y;
+  
+  // Просто добавляем смещение мыши. 
+  // Так как мы двигаем весь контейнер (translate), масштаб не влияет на "ощущение" движения мыши 1 к 1.
+  pX.value = initialPX + (c.clientX - startX);
+  pY.value = initialPY + (c.clientY - startY);
+  
+  clampCamera();
 };
 
 const stopDrag = () => {
@@ -233,18 +276,24 @@ const stopDrag = () => {
   store.setCamera(pX.value, pY.value);
 };
 
-const handleResize = () => {
-  const clamped = getClampedCoords(pX.value, pY.value);
-  pX.value = clamped.x; pY.value = clamped.y;
-};
-
 onMounted(() => {
+  window.addEventListener('resize', updateLayout);
+  
+  // Сначала инициализируем панду
   initPanda();
-  setTimeout(() => handleResize(), 50);
-  window.addEventListener('resize', handleResize);
+  
+  // Затем рассчитываем размеры экрана и масштаб
+  updateLayout();
+  
+  // И наконец центрируем камеру на панде (активном уровне)
+  // Небольшой таймаут, чтобы DOM успел отрисоваться для точных размеров
+  setTimeout(() => {
+    centerOnActiveLevel();
+  }, 10);
 });
+
 onUnmounted(() => {
-  window.removeEventListener('resize', handleResize);
+  window.removeEventListener('resize', updateLayout);
 });
 </script>
 
@@ -252,7 +301,12 @@ onUnmounted(() => {
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
 
 /* Базовые стили */
-.viewport { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; overflow: hidden; background-color: #2c3e50; user-select: none; font-family: 'Fredoka', sans-serif; }
+.viewport { 
+  position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; 
+  overflow: hidden; background-color: #2c3e50; 
+  user-select: none; font-family: 'Fredoka', sans-serif; 
+}
+
 .hud { position: absolute; top: 30px; left: 20px; right: 20px; z-index: 90; display: flex; justify-content: space-between; pointer-events: none; }
 .hud-panel { background: rgba(62, 39, 35, 0.9); border: 2px solid rgba(255, 215, 0, 0.4); border-radius: 25px; padding: 8px 20px; color: #ffd700; display: flex; align-items: center; box-shadow: 0 10px 25px rgba(0,0,0,0.4); pointer-events: auto; }
 .star-svg-icon { width: 30px; height: 30px; margin-right: 10px; filter: drop-shadow(0 0 5px rgba(255, 215, 0, 0.7)); }
@@ -262,8 +316,15 @@ onUnmounted(() => {
 .progress-shine { position: absolute; top:0; left:0; width:100%; height:100%; background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent); animation: shineLoad 2s infinite; }
 @keyframes shineLoad { from {transform: translateX(-100%);} to {transform: translateX(100%);}}
 
-.game-world { width: 2400px; height: 1792px; position: absolute; cursor: grab; }
+.game-world { 
+  width: 2400px; height: 1792px; 
+  position: absolute; cursor: grab; 
+  /* ВАЖНО: Точка трансформации сверху-слева для корректной работы координат при масштабировании */
+  transform-origin: 0 0; 
+  will-change: transform;
+}
 .game-world:active { cursor: grabbing; }
+
 .world-bg { width: 100%; height: 100%; position: absolute; top: 0; left: 0; background-image: linear-gradient(rgba(0,0,0,0.1), rgba(0,0,0,0.3)), url('@/views/background.png'); background-size: cover; z-index: 0; }
 .connections { position: absolute; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 .path-line { stroke: #fff; stroke-width: 8; stroke-linecap: round; fill: none; opacity: 0.6; stroke-dasharray: 15, 20; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); }
@@ -271,8 +332,7 @@ onUnmounted(() => {
 /* === 3D ПЛАТФОРМЫ === */
 .level-node {
   position: absolute;
-  width: 100px;
-  height: 70px;
+  width: 100px; height: 70px;
   z-index: 5;
   display: flex; flex-direction: column; align-items: center; justify-content: center;
   cursor: pointer;
