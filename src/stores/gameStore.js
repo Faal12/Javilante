@@ -9,10 +9,12 @@ export const useGameStore = defineStore('game', () => {
   const levels = ref([
     { 
       id: 1, 
-      x: 350, y: 1360, 
+      x: 450, y: 460, 
       unlocked: true, completed: false, stars: 0, 
-      title: "Der Anfang aller Dinge", // Начало всех вещей
+      title: "Der Anfang aller Dinge", 
       bgTheme: "theme-sakura", 
+      // Level 1 hat keine Waypoints, da es der Start ist
+      waypoints: [], 
       theory: {
         title: "Lektion 1: Variablen & Datentypen",
         content: `
@@ -92,10 +94,19 @@ export const useGameStore = defineStore('game', () => {
     },
     { 
       id: 2, 
-      x: 750, y: 980, 
+      x: 650, y: 1250, 
       unlocked: false, completed: false, stars: 0, 
-      title: "Die Kunst der Balance", // Operatoren
+      title: "Die Kunst der Balance", 
       bgTheme: "theme-sakura", 
+      // Wegpunkte von Lvl 1 -> Lvl 2 (Nach unten)
+      waypoints: [
+      { x: 427, y: 651 },
+      { x: 208, y: 851 },
+      { x: 225, y: 1028 },
+      { x: 338, y: 1129 },
+      { x: 446, y: 1243 },
+      { x: 564, y: 1293 }
+      ],
       theory: {
         title: "Lektion 2: Operatoren einsetzen",
         content: `
@@ -162,10 +173,22 @@ boolean kannKämpfen = (energie > 0) && !istBesiegt; // true`
     },
     { 
       id: 3, 
-      x: 1300, y: 820, 
+      x: 1000, y: 250, 
       unlocked: false, completed: false, stars: 0, 
-      title: "Der Pfad der Entscheidung", // If/Else
+      title: "Der Pfad der Entscheidung", 
       bgTheme: "theme-sakura",
+      // Wegpunkte von Lvl 2 -> Lvl 3 (Steil nach oben)
+      waypoints: [
+        { x: 803, y: 1254 },
+      { x: 928, y: 1121 },
+      { x: 922, y: 965 },
+      { x: 896, y: 826 },
+      { x: 862, y: 695 },
+      { x: 855, y: 541 },
+      { x: 864, y: 421 },
+      { x: 916, y: 344 },
+      { x: 959, y: 318 }
+      ],
       theory: {
         title: "Lektion 3: Verzweigungen mit if/else",
         content: `
@@ -228,10 +251,24 @@ if (note == 1) {
     },
     { 
       id: 4, 
-      x: 1550, y: 630, 
+      x: 1450, y: 1220, 
       unlocked: false, completed: false, stars: 0, 
-      title: "Die Halle der tausend Türen", // Switch
+      title: "Die Halle der tausend Türen", 
       bgTheme: "theme-sakura",
+      // Wegpunkte von Lvl 3 -> Lvl 4 (Steil nach unten)
+      waypoints: [
+      { x: 1198, y: 336 },
+      { x: 1275, y: 451 },
+      { x: 1279, y: 557 },
+      { x: 1271, y: 678 },
+      { x: 1237, y: 773 },
+      { x: 1220, y: 904 },
+      { x: 1220, y: 1021 },
+      { x: 1235, y: 1112 },
+      { x: 1286, y: 1181 },
+      { x: 1334, y: 1218 },
+      { x: 1420, y: 1251 }
+      ],
       theory: {
         title: "Lektion 4: Die Switch-Case Anweisung",
         content: `
@@ -293,10 +330,22 @@ switch (tag) {
     },
     { 
       id: 5, 
-      x: 1750, y: 435, 
+      x: 1800, y: 550, 
       unlocked: false, completed: false, stars: 0, 
-      title: "Der Kreis und die Armee", // Arrays & Loops
+      title: "Der Kreis und die Armee", 
       bgTheme: "theme-sakura",
+      // Wegpunkte von Lvl 4 -> Lvl 5 (Nach oben)
+      waypoints: [
+      { x: 1602, y: 1250 },
+      { x: 1712, y: 1200 },
+      { x: 1784, y: 1119 },
+      { x: 1812, y: 1029 },
+      { x: 1830, y: 934 },
+      { x: 1835, y: 864 },
+      { x: 1851, y: 761 },
+      { x: 1846, y: 689 },
+      { x: 1849, y: 638 }
+      ],
       theory: {
         title: "Lektion 5: Arrays & Schleifen",
         content: `
@@ -349,7 +398,26 @@ for (int i = 0; i < ninjas.length; i++) {
         }
       ]
     },
-    { id: 6, x: 2050, y: 265, unlocked: false, completed: false, stars: 0, title: "Meisterprüfung", isBoss: true, bgTheme: "theme-sakura", theory: { title: "Das Finale", content: "Besiege den Bug!", code: "" }, tasks: [] },
+    { 
+      id: 6, 
+      x: 2150, y: 265, 
+      unlocked: false, completed: false, stars: 0, 
+      title: "Meisterprüfung", 
+      isBoss: true, 
+      bgTheme: "theme-sakura",
+      // Wegpunkte von Lvl 5 -> Lvl 6 (Nach rechts oben)
+      waypoints: [
+         { x: 1858, y: 510 },
+      { x: 1878, y: 454 },
+      { x: 1910, y: 397 },
+      { x: 1959, y: 360 },
+      { x: 2007, y: 336 },
+      { x: 2044, y: 328 },
+      { x: 2109, y: 316 }
+      ],
+      theory: { title: "Das Finale", content: "Besiege den Bug!", code: "" }, 
+      tasks: [] 
+    },
   ]);
 
   const totalStars = computed(() => levels.value.reduce((sum, lvl) => sum + lvl.stars, 0));
@@ -389,7 +457,7 @@ for (int i = 0; i < ninjas.length; i++) {
     cameraPos.value = { x: 0, y: 0 };
   }
 
-  const savedState = localStorage.getItem('java-game-store-v8');
+  const savedState = localStorage.getItem('java-game-store-v9');
   if (savedState) {
     const parsed = JSON.parse(savedState);
     levels.value.forEach(l => {
@@ -405,7 +473,7 @@ for (int i = 0; i < ninjas.length; i++) {
   }
 
   watch([levels, playerName, mascotStage], () => {
-    localStorage.setItem('java-game-store-v8', JSON.stringify({
+    localStorage.setItem('java-game-store-v9', JSON.stringify({
       levels: levels.value,
       playerName: playerName.value,
       mascotStage: mascotStage.value

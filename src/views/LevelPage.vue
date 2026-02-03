@@ -1,5 +1,5 @@
 <template>
-  <div class="level-page theme-sakura">
+  <div class="level-page theme-sakura" :style="bgStyle">
     
     <div class="sakura-decor">
       <div class="falling-petals">
@@ -227,6 +227,24 @@ const currentTask = computed(() => {
   return null;
 });
 
+// === ДИНАМИЧЕСКИЙ ФОН ===
+// Генерируем стиль фона в зависимости от ID уровня
+const bgStyle = computed(() => {
+  const id = parseInt(levelId);
+  const gradients = {
+    1: 'radial-gradient(circle at center, #fff3e0 0%, #ffccbc 100%)', // Персиковый (оригинал)
+    2: 'radial-gradient(circle at center, #e0f2f1 0%, #80cbc4 100%)', // Мятный (Teal)
+    3: 'radial-gradient(circle at center, #e3f2fd 0%, #64b5f6 100%)', // Небесный (Blue)
+    4: 'radial-gradient(circle at center, #f3e5f5 0%, #ba68c8 100%)', // Лавандовый (Purple)
+    5: 'radial-gradient(circle at center, #fff8e1 0%, #ffd54f 100%)', // Солнечный (Yellow)
+    6: 'radial-gradient(circle at center, #ffebee 0%, #e57373 100%)'  // Босс (Red)
+  };
+  // Если уровень > 6, используем дефолтный (1)
+  return {
+    background: gradients[id] || gradients[1]
+  };
+});
+
 // === ФИКС: Генерируем стили лепестков один раз ===
 const petalsStyles = ref([]);
 
@@ -318,7 +336,8 @@ onMounted(() => {
   font-family: 'Fredoka', sans-serif;
   overflow: hidden;
   position: relative;
-  background: radial-gradient(circle at center, #fff3e0 0%, #ffccbc 100%);
+  /* Статичный фон убрали, теперь он задается через :style */
+  transition: background 1s ease; /* Плавный переход цвета, если вдруг переключишься */
   --accent: #d81b60; 
   --text-dark: #3e2723;
 }
