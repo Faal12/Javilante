@@ -1,122 +1,128 @@
 <template>
   <div class="boss-battle-container">
     
-    <div class="cyber-bg">
-      <div class="grid-floor"></div>
-      <div class="neon-rain"></div>
-      <div class="vignette"></div>
-      <div class="damage-glitch" :class="{ active: showDamage }"></div>
+    <div class="mystic-bg">
+      <div class="fog-layer layer-1"></div>
+      <div class="fog-layer layer-2"></div>
+      <div class="particles">
+        <span v-for="n in 20" :key="n" class="firefly" :style="getFireflyStyle(n)"></span>
+      </div>
+      <div class="crit-flash" :class="{ active: showDamage }"></div>
     </div>
 
     <div v-if="phase === 'intro'" class="intro-layer" @click="advanceDialog">
-      <div class="hologram-projector">
-        <div class="holo-beam"></div>
-        <img src="@/assets/boss_idle.webp" class="boss-holo" alt="Grandmaster" />
-        <div class="holo-base"></div>
+      <div class="boss-summon-circle">
+        <div class="mandala outer"></div>
+        <div class="mandala inner"></div>
+        <div class="energy-core"></div>
+        
+        <img src="@/assets/boss_idle.webp" class="boss-portrait floating" alt="Grandmaster" />
       </div>
       
-      <div class="cyber-dialog">
-        <div class="dialog-header">
-          <div class="boss-icon">師</div>
-          <span class="boss-name">{{ bossData.name }}</span>
-          <div class="dialog-loading"></div>
+      <div class="dialog-scroll pop-in">
+        <div class="scroll-header">
+          <span class="boss-title">GRANDMASTER</span>
+          <h2 class="boss-name">{{ bossData.name }}</h2>
         </div>
-        <p class="dialog-text">
-          <span class="prompt">root@dojo:~$</span> 
-          {{ currentDialogText }}<span class="cursor">_</span>
-        </p>
-        <div class="dialog-footer">
-          CLICK_TO_CONTINUE [ENTER]
+        <div class="scroll-body">
+          <p class="dialog-text">
+            {{ currentDialogText }}<span class="cursor">|</span>
+          </p>
+        </div>
+        <div class="scroll-footer">
+          Klicke zum Fortfahren ⚔️
         </div>
       </div>
     </div>
 
     <div v-else-if="phase === 'fight'" class="fight-layer">
       
-      <div class="cyber-hud">
-        <div class="hud-frame">
-          <div class="hud-section life-section">
-            <span class="hud-label">INTEGRITY</span>
-            <div class="life-bar">
-              <div 
-                v-for="n in 3" 
-                :key="n" 
-                class="life-block" 
-                :class="{ active: n <= lives, lost: n > lives }"
-              ></div>
-            </div>
+      <div class="battle-hud slide-down">
+        <div class="player-stats">
+          <div class="stat-label">DEINE ENERGIE</div>
+          <div class="hearts-container">
+            <transition-group name="heart-break">
+              <span v-for="n in lives" :key="n" class="heart">❤️</span>
+            </transition-group>
           </div>
-          
-          <div class="hud-section timer-section">
-            <span class="hud-label">SYSTEM PURGE</span>
-            <div class="digital-clock" :class="{ critical: timeLeft < 20 }">
-              {{ formattedTime }}
-            </div>
-            <div class="time-bar-bg">
-              <div class="time-bar-fill" :style="{ width: timePercent + '%' }"></div>
-            </div>
+        </div>
+        
+        <div class="boss-timer" :class="{ critical: timeLeft < 20 }">
+          <div class="timer-ring">
+            <svg viewBox="0 0 100 100">
+              <circle cx="50" cy="50" r="45" class="bg-ring" />
+              <circle 
+                cx="50" cy="50" r="45" 
+                class="progress-ring" 
+                :stroke-dasharray="283" 
+                :stroke-dashoffset="283 * (1 - timePercent / 100)"
+              />
+            </svg>
+            <span class="timer-value">{{ timeLeft }}</span>
           </div>
         </div>
       </div>
 
       <div class="arena-stage">
-        
-        <transition name="glitch-pop">
-          <div v-if="activeTaunt" class="cyber-taunt">
-            <span class="taunt-text">{{ activeTaunt }}</span>
-            <div class="taunt-line"></div>
+        <transition name="scale-fade">
+          <div v-if="activeTaunt" class="boss-taunt">
+            {{ activeTaunt }}
           </div>
         </transition>
 
-        <div class="boss-entity">
-          <img 
-            src="@/assets/boss_idle.webp" 
-            class="boss-image" 
-            :class="{ damaged: showDamage }" 
-            alt="Boss"
-          />
-          <div class="neon-shadow"></div>
-        </div>
+        <div class="boss-container">
+          <transition name="projectile-fly">
+            <div v-if="isAttacking" class="magic-projectile">🔥</div>
+          </transition>
 
+          <div class="boss-aura-wrapper">
+            <div class="aura-waves"></div>
+            <img 
+              src="@/assets/boss_idle.webp" 
+              class="boss-figure" 
+              :class="{ damaged: showDamage }" 
+              alt="Boss"
+            />
+          </div>
+          <div class="shadow-portal"></div>
+        </div>
       </div>
 
-      <div class="cyber-terminal">
-        <div class="terminal-header">
-          <span class="status-dot"></span>
-          <span class="title">DOJO_PROTOCOL_V2.EXE</span>
+      <div class="spell-input slide-up">
+        <div class="spell-header">
+          <span class="rune">⚡</span> CODE-ZAUBER <span class="rune">⚡</span>
         </div>
-        <div class="terminal-body">
-          <div class="code-comment">// {{ bossData.task.question }}</div>
-          <div class="input-line">
-            <span class="prompt">>></span>
+        <div class="spell-body">
+          <div class="quest-text">// {{ bossData.task.question }}</div>
+          <div class="input-group">
             <input 
               ref="inputRef"
               v-model="userCode" 
-              class="hacking-input" 
+              class="magic-input" 
               type="text" 
-              placeholder="Inject code..." 
+              placeholder="Forme deinen Code..." 
               spellcheck="false"
               autocomplete="off"
-              @keydown.enter="submitAnswer"
+              @keydown.enter="triggerAttack"
             />
+            <button class="cast-btn" @click="triggerAttack">
+              FEUER!
+            </button>
           </div>
-          <button class="execute-btn" @click="submitAnswer">
-            EXECUTE();
-          </button>
         </div>
       </div>
 
     </div>
 
     <div v-else class="result-layer">
-      <div class="result-card" :class="phase">
-        <div class="result-glitch-icon">{{ phase === 'win' ? '👑' : '☠️' }}</div>
-        <h1 class="result-title">{{ phase === 'win' ? 'SYSTEM HACKED' : 'FATAL ERROR' }}</h1>
-        <p class="result-desc">
-          {{ phase === 'win' ? 'Access Granted. The Dojo is yours.' : 'Connection Terminated by Host.' }}
+      <div class="victory-seal pop-in" :class="phase">
+        <div class="seal-icon">{{ phase === 'win' ? '🏆' : '💀' }}</div>
+        <h1 class="seal-title">{{ phase === 'win' ? 'LEGENDÄR!' : 'BESIEGT' }}</h1>
+        <p class="seal-desc">
+          {{ phase === 'win' ? 'Du hast die Prüfung gemeistert.' : 'Deine Konzentration war zu schwach.' }}
         </p>
-        <button class="cyber-btn" @click="handleResultAction">
-          {{ phase === 'win' ? 'LOGOUT' : 'REBOOT SYSTEM' }}
+        <button class="epic-btn" @click="handleResultAction">
+          {{ phase === 'win' ? 'WEITERREISEN' : 'WIEDERAUFSTEHEN' }}
         </button>
       </div>
     </div>
@@ -133,7 +139,7 @@ const props = defineProps({
 
 const emit = defineEmits(['level-completed']);
 
-// === STATE ===
+// STATE
 const phase = ref('intro');
 const lives = ref(props.bossData.health || 3);
 const timeLeft = ref(props.bossData.timeSeconds || 120);
@@ -146,12 +152,13 @@ const isTyping = ref(false);
 
 const showDamage = ref(false);
 const activeTaunt = ref(null);
+const isAttacking = ref(false); // Для анимации снаряда
 
 let timerInterval = null;
 let tauntInterval = null;
 let typeInterval = null;
 
-// === COMPUTED ===
+// COMPUTED
 const timePercent = computed(() => (timeLeft.value / (props.bossData.timeSeconds || 120)) * 100);
 
 const formattedTime = computed(() => {
@@ -160,7 +167,7 @@ const formattedTime = computed(() => {
   return `${m}:${s.toString().padStart(2, '0')}`;
 });
 
-// === LIFECYCLE ===
+// LIFECYCLE
 onMounted(() => {
   startDialog();
 });
@@ -175,7 +182,15 @@ function clearIntervals() {
   clearInterval(typeInterval);
 }
 
-// === DIALOG LOGIC ===
+// Random Fireflies
+const getFireflyStyle = (n) => ({
+  top: Math.random() * 100 + '%',
+  left: Math.random() * 100 + '%',
+  animationDelay: Math.random() * 5 + 's',
+  animationDuration: 3 + Math.random() * 5 + 's'
+});
+
+// DIALOG
 function startDialog() {
   if (!props.bossData.dialogues?.length) return startFight();
   typeText(props.bossData.dialogues[0]);
@@ -212,7 +227,7 @@ function advanceDialog() {
   }
 }
 
-// === FIGHT LOGIC ===
+// FIGHT
 function startFight() {
   phase.value = 'fight';
   timeLeft.value = props.bossData.timeSeconds;
@@ -229,7 +244,6 @@ function startFight() {
 }
 
 function startBehavior() {
-  // Только таунты, без движения
   tauntInterval = setInterval(() => {
     if (Math.random() > 0.5 && props.bossData.taunts) {
       activeTaunt.value = props.bossData.taunts[Math.floor(Math.random() * props.bossData.taunts.length)];
@@ -238,10 +252,20 @@ function startBehavior() {
   }, 4500);
 }
 
-function submitAnswer() {
+// АНИМАЦИЯ АТАКИ + ПРОВЕРКА
+function triggerAttack() {
+  if (!userCode.value) return;
+  
   const regex = props.bossData.task.correctRegex;
-  if (regex.test(userCode.value.trim())) {
-    victory();
+  const isCorrect = regex.test(userCode.value.trim());
+
+  if (isCorrect) {
+    // Запускаем снаряд
+    isAttacking.value = true;
+    setTimeout(() => {
+      isAttacking.value = false;
+      victory();
+    }, 600); // Ждем пока долетит снаряд (600ms)
   } else {
     damagePlayer();
   }
@@ -279,215 +303,236 @@ function handleResultAction() {
 </script>
 
 <style scoped>
-@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@700&display=swap');
 
-/* === КОНТЕЙНЕР === */
+/* === ГЛОБАЛЬНЫЙ КОНТЕЙНЕР === */
 .boss-battle-container {
   width: 100%; height: 100%; position: relative; overflow: hidden;
-  background-color: #050505; color: #e0e0e0;
-  font-family: 'Share Tech Mono', monospace;
+  background-color: #1a0b2e; /* Темно-фиолетовый мистический */
+  color: #fff;
+  font-family: 'Cinzel', serif;
 }
 
-/* === ФОН === */
-.cyber-bg {
+/* === ФОН (MYSTIC) === */
+.mystic-bg {
   position: absolute; inset: 0; pointer-events: none; z-index: 0;
-  background: radial-gradient(circle at center, #0a0a12 0%, #000000 100%);
+  background: radial-gradient(circle at bottom, #2d1b4e 0%, #0d0221 100%);
 }
-.grid-floor {
-  position: absolute; bottom: 0; width: 200%; height: 50%; left: -50%;
-  background-image: 
-    linear-gradient(rgba(255, 0, 85, 0.2) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 0, 85, 0.2) 1px, transparent 1px);
-  background-size: 60px 60px;
-  transform: perspective(600px) rotateX(60deg);
-  mask-image: linear-gradient(to top, black 20%, transparent 100%);
-  animation: gridMove 20s linear infinite;
+.fog-layer {
+  position: absolute; inset: 0; opacity: 0.3;
+  background: url('https://www.transparenttextures.com/patterns/foggy-birds.png');
+  animation: fogMove 60s linear infinite;
 }
-.matrix-rain {
-  position: absolute; inset: 0; opacity: 0.1;
-  background: repeating-linear-gradient(0deg, transparent, transparent 50%, #00e5ff 50%, #00e5ff 51%);
-  background-size: 100% 4px;
-  animation: scanline 8s linear infinite;
-}
-.vignette { position: absolute; inset: 0; background: radial-gradient(circle, transparent 60%, #000000 100%); }
-.damage-glitch {
-  position: absolute; inset: 0; background: #ff0055; opacity: 0;
-  mix-blend-mode: color-dodge; transition: opacity 0.1s; z-index: 100;
-}
-.damage-glitch.active { opacity: 0.6; }
+.layer-2 { animation-direction: reverse; animation-duration: 80s; opacity: 0.2; }
 
-/* === ИНТРО === */
+/* Светлячки */
+.firefly {
+  position: absolute; width: 4px; height: 4px; background: #ffd700;
+  border-radius: 50%; box-shadow: 0 0 10px #ffd700;
+  animation: fireflyFloat linear infinite;
+}
+
+/* Вспышка урона */
+.crit-flash {
+  position: absolute; inset: 0; background: #ff0055; opacity: 0; transition: opacity 0.1s;
+  mix-blend-mode: hard-light; z-index: 100;
+}
+.crit-flash.active { opacity: 0.6; }
+
+/* === ИНТРО (MANDALA SUMMON) === */
 .intro-layer {
   position: absolute; inset: 0; z-index: 50;
-  background: rgba(0,0,0,0.9); backdrop-filter: blur(10px);
+  background: rgba(13, 2, 33, 0.9); backdrop-filter: blur(8px);
   display: flex; flex-direction: column; justify-content: center; align-items: center;
 }
-.hologram-projector { position: relative; width: 200px; height: 200px; margin-bottom: 30px; }
-.boss-holo {
-  width: 100%; height: 100%; object-fit: contain;
-  filter: drop-shadow(0 0 15px rgba(0, 229, 255, 0.5)); 
-  opacity: 0.95;
-  animation: float 4s ease-in-out infinite;
+.boss-summon-circle {
+  position: relative; width: 300px; height: 300px;
+  display: flex; justify-content: center; align-items: center;
+  margin-bottom: 40px;
 }
-.holo-beam {
-  position: absolute; bottom: -20px; left: 50%; transform: translateX(-50%);
-  width: 150px; height: 50px; 
-  background: radial-gradient(ellipse, rgba(0, 229, 255, 0.4) 0%, transparent 70%);
-  filter: blur(10px);
+.mandala {
+  position: absolute; inset: 0; border: 2px solid rgba(255, 215, 0, 0.3);
+  border-radius: 50%;
 }
-.cyber-dialog {
-  width: 90%; max-width: 600px; padding: 25px;
-  background: rgba(10, 15, 20, 0.95); border: 1px solid #00e5ff;
-  box-shadow: 0 0 30px rgba(0, 229, 255, 0.1);
+.mandala.outer {
+  border: 4px dashed #ffd700; animation: spin 20s linear infinite;
+  box-shadow: 0 0 30px rgba(255, 215, 0, 0.2);
+}
+.mandala.inner {
+  width: 70%; height: 70%; top: 15%; left: 15%;
+  border: 2px solid #ff0055; animation: spin 10s linear infinite reverse;
+}
+.boss-portrait.floating {
+  width: 80%; height: 80%; object-fit: contain; z-index: 2;
+  filter: drop-shadow(0 0 20px rgba(255, 0, 85, 0.5));
+  animation: float 3s ease-in-out infinite;
+}
+
+.dialog-scroll {
+  width: 90%; max-width: 500px; background: #fff8e1; color: #3e2723;
+  padding: 30px; border-radius: 4px;
+  border-top: 5px solid #d32f2f; border-bottom: 5px solid #d32f2f;
+  box-shadow: 0 20px 50px rgba(0,0,0,0.5); text-align: center;
   position: relative;
 }
-.dialog-header {
-  display: flex; align-items: center; gap: 15px; border-bottom: 1px solid #00e5ff; padding-bottom: 10px; margin-bottom: 15px;
+.scroll-header { border-bottom: 1px solid #d32f2f; padding-bottom: 10px; margin-bottom: 15px; }
+.boss-title { font-size: 0.8rem; color: #d32f2f; letter-spacing: 3px; font-weight: bold; }
+.boss-name { font-size: 2rem; margin: 5px 0; }
+.dialog-text { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; line-height: 1.5; min-height: 60px; }
+.scroll-footer {
+  margin-top: 20px; font-weight: bold; color: #d32f2f; font-size: 0.9rem;
+  animation: pulse 1.5s infinite; cursor: pointer;
 }
-.boss-icon {
-  background: #00e5ff; color: #000; font-weight: bold; width: 30px; height: 30px;
-  display: flex; justify-content: center; align-items: center; font-size: 1.2rem;
-}
-.boss-name { font-family: 'Orbitron'; color: #00e5ff; font-size: 1.2rem; letter-spacing: 2px; }
-.dialog-text { font-size: 1.2rem; line-height: 1.5; color: #fff; min-height: 3em; }
-.prompt { color: #ff0055; margin-right: 8px; }
-.dialog-footer { text-align: right; font-size: 0.8rem; color: #00e5ff; margin-top: 15px; animation: blink 1.5s infinite; }
 
-/* === FIGHT UI === */
+/* === HUD (BATTLE) === */
 .fight-layer {
   position: relative; z-index: 10; width: 100%; height: 100%;
-  display: flex; flex-direction: column; 
-  padding: 80px 15px 15px 15px; 
+  display: flex; flex-direction: column; padding: 20px;
 }
-.cyber-hud { display: flex; justify-content: center; width: 100%; margin-bottom: 10px; }
-.hud-frame {
-  display: flex; gap: 40px; align-items: center;
-  background: rgba(0,0,0,0.8); border: 1px solid #ff0055;
-  padding: 10px 30px; border-radius: 4px;
-  box-shadow: 0 0 20px rgba(255, 0, 85, 0.15);
-  clip-path: polygon(10px 0, 100% 0, 100% calc(100% - 10px), calc(100% - 10px) 100%, 0 100%, 0 10px);
+.battle-hud {
+  display: flex; justify-content: space-between; align-items: center;
+  width: 100%; max-width: 700px; margin: 0 auto 20px;
 }
-.hud-label { display: block; font-size: 0.7rem; color: #ff0055; letter-spacing: 1px; margin-bottom: 5px; opacity: 0.8; }
-.life-bar { display: flex; gap: 6px; }
-.life-block { width: 25px; height: 12px; background: #330011; border: 1px solid #550022; transition: all 0.3s; }
-.life-block.active { background: #ff0055; border-color: #ff99bb; box-shadow: 0 0 8px #ff0055; }
+.stat-label { font-size: 0.7rem; color: #ffd700; letter-spacing: 2px; margin-bottom: 5px; opacity: 0.8; }
+.hearts-container { display: flex; gap: 8px; font-size: 2rem; filter: drop-shadow(0 0 5px #ff0055); }
 
-.timer-section { text-align: right; }
-.digital-clock { font-family: 'Orbitron'; font-size: 1.8rem; color: #fff; line-height: 1; }
-.digital-clock.critical { color: #ff0055; text-shadow: 0 0 10px #ff0055; animation: blink 0.5s infinite; }
-.time-bar-bg { width: 120px; height: 4px; background: #333; margin-top: 5px; }
-.time-bar-fill { height: 100%; background: #00e5ff; transition: width 1s linear; box-shadow: 0 0 5px #00e5ff; }
-
-/* === АРЕНА (ЦЕНТР) === */
-.arena-stage { 
-  flex: 1; position: relative; width: 100%; overflow: hidden; 
-  display: flex; justify-content: center; align-items: flex-end;
+/* Крутой таймер */
+.boss-timer { position: relative; width: 80px; height: 80px; }
+.timer-ring { width: 100%; height: 100%; position: relative; }
+.timer-ring svg { transform: rotate(-90deg); width: 100%; height: 100%; }
+.bg-ring { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 6; }
+.progress-ring { 
+  fill: none; stroke: #00e5ff; stroke-width: 6; stroke-linecap: round;
+  transition: stroke-dashoffset 1s linear;
+}
+.boss-timer.critical .progress-ring { stroke: #ff0055; filter: drop-shadow(0 0 10px #ff0055); }
+.timer-value {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+  font-family: 'JetBrains Mono'; font-size: 1.5rem; font-weight: bold;
 }
 
-/* БОСС (СТАТИЧНЫЙ ЦЕНТР) */
-.boss-entity {
-  position: relative; /* Не absolute! Чтобы был в потоке flex */
-  width: 280px; height: 280px; 
-  margin-bottom: 20px;
-  z-index: 5;
-}
-@media (min-width: 768px) {
-  .boss-entity { width: 400px; height: 400px; }
+/* === АРЕНА И БОСС === */
+.arena-stage {
+  flex: 1; display: flex; justify-content: center; align-items: flex-end;
+  position: relative; padding-bottom: 40px;
 }
 
-/* ПРОСТО КАРТИНКА */
-.boss-image {
-  width: 100%; height: 100%;
-  object-fit: contain;
-  /* Легкое дыхание */
-  animation: float 3s ease-in-out infinite;
-  /* Мягкая тень */
-  filter: drop-shadow(0 0 8px rgba(255, 0, 85, 0.4));
+.boss-container { position: relative; width: 300px; height: 300px; z-index: 5; }
+.boss-figure {
+  width: 100%; height: 100%; object-fit: contain;
+  filter: drop-shadow(0 0 15px rgba(100, 0, 255, 0.4));
+  animation: float 4s ease-in-out infinite;
 }
-.boss-image.damaged {
+.boss-figure.damaged {
   filter: brightness(2) sepia(1) hue-rotate(-50deg) saturate(300%);
   animation: shake 0.4s;
 }
 
-.neon-shadow {
-  position: absolute; bottom: 10px; left: 20%; width: 60%; height: 15px;
-  background: #ff0055; filter: blur(20px); opacity: 0.3; transform: scaleY(0.5);
+/* Магическая Аура */
+.boss-aura-wrapper { position: relative; width: 100%; height: 100%; }
+.aura-waves {
+  position: absolute; inset: -20px; border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 0 20px rgba(138, 43, 226, 0.3);
+  animation: pulse 3s infinite;
+}
+.shadow-portal {
+  position: absolute; bottom: 0; left: 10%; width: 80%; height: 20px;
+  background: radial-gradient(ellipse, #000 0%, transparent 70%);
+  opacity: 0.6; transform: scaleY(0.5);
 }
 
-/* НАСМЕШКА */
-.cyber-taunt {
-  position: absolute; 
-  top: 10%; /* Над боссом */
-  left: 50%; /* Центр экрана */
-  transform: translateX(-50%);
-  background: rgba(0,0,0,0.9); border: 2px solid #ff0055;
-  padding: 8px 16px; color: #ff0055; font-weight: bold; font-size: 1rem;
-  white-space: nowrap; z-index: 20;
-  box-shadow: 0 0 15px rgba(255, 0, 85, 0.3);
-}
-.cyber-taunt::after {
-  content: ''; position: absolute; bottom: -10px; left: 50%; transform: translateX(-50%);
-  border-width: 10px 6px 0; border-style: solid; border-color: #ff0055 transparent transparent;
+/* Снаряд (Атака) */
+.magic-projectile {
+  position: absolute; bottom: -100px; left: 50%; font-size: 3rem;
+  transform: translateX(-50%); z-index: 20;
+  text-shadow: 0 0 20px #ff9900;
 }
 
-/* === ТЕРМИНАЛ === */
-.cyber-terminal {
-  position: relative; z-index: 20;
-  width: 100%; max-width: 700px; margin: 0 auto;
-  background: rgba(10, 15, 20, 0.95); border: 1px solid #00e5ff;
-  border-radius: 6px 6px 0 0; box-shadow: 0 -5px 30px rgba(0, 229, 255, 0.1);
+/* Насмешка */
+.boss-taunt {
+  position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,0.8); border: 1px solid #ffd700; color: #ffd700;
+  padding: 10px 20px; font-weight: bold; border-radius: 4px;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); white-space: nowrap; z-index: 10;
 }
-.terminal-header {
-  background: rgba(0, 229, 255, 0.15); padding: 8px 15px;
-  display: flex; align-items: center; gap: 10px;
-  font-size: 0.8rem; color: #00e5ff; letter-spacing: 1px;
-}
-.status-dot { width: 8px; height: 8px; background: #00e5ff; border-radius: 50%; box-shadow: 0 0 5px #00e5ff; }
-.terminal-body { padding: 20px; }
-.code-comment { color: #00e5ff; opacity: 0.7; margin-bottom: 12px; font-style: italic; }
-.input-line { display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #333; padding-bottom: 5px; }
-.prompt { color: #ff0055; font-weight: bold; font-size: 1.2rem; }
-.hacking-input {
-  background: transparent; border: none; color: #fff; flex: 1;
-  font-family: 'Share Tech Mono', monospace; font-size: 1.2rem; outline: none;
-}
-.execute-btn {
-  width: 100%; margin-top: 15px; padding: 15px;
-  background: #00e5ff; color: #000; font-weight: bold; border: none;
-  font-family: 'Orbitron'; letter-spacing: 2px; cursor: pointer;
-  transition: all 0.2s;
-}
-.execute-btn:hover { background: #fff; box-shadow: 0 0 20px #00e5ff; }
 
-/* === РЕЗУЛЬТАТ === */
+/* === SPELL INPUT (TERMINAL) === */
+.spell-input {
+  width: 100%; max-width: 650px; margin: 0 auto;
+  background: #150529; border: 2px solid #9d4edd; border-radius: 12px;
+  box-shadow: 0 0 30px rgba(157, 78, 221, 0.2); z-index: 20;
+}
+.spell-header {
+  background: #240046; padding: 10px; text-align: center;
+  color: #e0aaff; font-size: 0.9rem; letter-spacing: 2px;
+  border-bottom: 1px solid #9d4edd;
+}
+.rune { color: #ffd700; margin: 0 10px; }
+.spell-body { padding: 20px; }
+.quest-text { color: #c77dff; font-family: 'JetBrains Mono'; margin-bottom: 15px; font-size: 1rem; }
+.input-group { display: flex; gap: 10px; }
+.magic-input {
+  flex: 1; background: #3c096c; border: 1px solid #5a189a; border-radius: 6px;
+  color: #fff; font-family: 'JetBrains Mono'; font-size: 1.1rem; padding: 12px;
+  outline: none; transition: all 0.3s;
+}
+.magic-input:focus { border-color: #e0aaff; box-shadow: 0 0 10px #e0aaff; }
+.cast-btn {
+  background: #ff9100; border: none; padding: 0 25px; border-radius: 6px;
+  color: #fff; font-weight: bold; font-family: 'Cinzel'; font-size: 1.1rem;
+  cursor: pointer; transition: transform 0.1s;
+}
+.cast-btn:active { transform: scale(0.95); }
+
+/* === RESULT === */
 .result-layer {
-  position: absolute; inset: 0; background: rgba(0,0,0,0.95); z-index: 100;
+  position: absolute; inset: 0; background: rgba(13, 2, 33, 0.95); z-index: 100;
   display: flex; justify-content: center; align-items: center;
 }
-.result-card {
-  text-align: center; border: 3px solid; padding: 50px; max-width: 500px; background: #000;
-  box-shadow: 0 0 50px rgba(0,0,0,0.8);
+.victory-seal {
+  text-align: center; border: 4px double #ffd700; padding: 50px;
+  background: #1a0b2e; border-radius: 8px; box-shadow: 0 0 60px rgba(255, 215, 0, 0.4);
+  width: 90%; max-width: 450px;
 }
-.result-card.win { border-color: #00e5ff; color: #00e5ff; }
-.result-card.lose { border-color: #ff0055; color: #ff0055; }
-.result-icon { font-size: 3rem; margin-bottom: 20px; }
-.result-title { font-family: 'Orbitron'; font-size: 3rem; margin: 0; }
-.result-desc { font-size: 1.2rem; margin-top: 10px; opacity: 0.8; }
-.cyber-btn {
-  margin-top: 40px; padding: 15px 50px; background: transparent;
-  border: 2px solid currentColor; color: currentColor;
-  font-family: 'Orbitron'; font-weight: bold; cursor: pointer; transition: all 0.3s;
+.victory-seal.lose { border-color: #ff0055; box-shadow: 0 0 60px rgba(255, 0, 85, 0.4); }
+.seal-icon { font-size: 4rem; margin-bottom: 20px; }
+.seal-title { font-size: 2.5rem; margin: 0; letter-spacing: 4px; color: #ffd700; }
+.seal-desc { color: #e0e0e0; font-family: 'JetBrains Mono'; margin: 20px 0 30px; }
+.epic-btn {
+  background: transparent; border: 2px solid #ffd700; color: #ffd700;
+  padding: 15px 40px; font-weight: bold; font-size: 1.2rem; cursor: pointer;
+  transition: all 0.3s; font-family: 'Cinzel';
 }
-.cyber-btn:hover { background: currentColor; color: #000; box-shadow: 0 0 20px currentColor; }
+.epic-btn:hover { background: #ffd700; color: #000; box-shadow: 0 0 20px #ffd700; }
 
-/* === АНИМАЦИИ === */
-@keyframes gridMove { from { transform: perspective(600px) rotateX(60deg) translateY(0); } to { transform: perspective(600px) rotateX(60deg) translateY(60px); } }
-@keyframes scanline { 0% { background-position: 0 0; } 100% { background-position: 0 100%; } }
-@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+/* === ANIMATIONS === */
+@keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+@keyframes spin { to { transform: rotate(360deg); } }
+@keyframes pulse { 50% { opacity: 0.5; } }
 @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-8px); } 75% { transform: translateX(8px); } }
-@keyframes blink { 50% { opacity: 0; } }
-@keyframes load { 0% { left: -100%; } 100% { left: 200%; } }
-.glitch-pop-enter-active, .glitch-pop-leave-active { transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
-.glitch-pop-enter-from { opacity: 0; transform: scale(0.8) translateY(20px); }
+@keyframes fogMove { from { background-position: 0 0; } to { background-position: 1000px 0; } }
+@keyframes fireflyFloat { 
+  0% { transform: translate(0, 0); opacity: 0; } 
+  50% { opacity: 1; } 
+  100% { transform: translate(50px, -50px); opacity: 0; } 
+}
+
+/* Анимация полета снаряда */
+.projectile-fly-enter-active { transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94); }
+.projectile-fly-enter-from { opacity: 0; transform: translateY(100px) scale(0.5); }
+.projectile-fly-leave-to { opacity: 0; transform: translateY(-300px) scale(2); }
+
+.pop-in { animation: popIn 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+@keyframes popIn { from { opacity: 0; transform: scale(0.8); } to { opacity: 1; transform: scale(1); } }
+
+.slide-down { animation: slideDown 0.8s ease-out; }
+@keyframes slideDown { from { transform: translateY(-50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.slide-up { animation: slideUp 0.8s ease-out; }
+@keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+
+.scale-fade-enter-active, .scale-fade-leave-active { transition: all 0.3s; }
+.scale-fade-enter-from { opacity: 0; transform: translateY(10px) scale(0.8); }
 </style>

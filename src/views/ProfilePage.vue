@@ -89,10 +89,10 @@
             <button v-for="icon in emojiAvatars" :key="icon" class="avatar-option" @click="selectAvatar(icon)">
               {{ icon }}
             </button>
-            <button class="avatar-option img-option" @click="selectAvatar(pandaUrl)">
+            <button v-if="pandaUrl" class="avatar-option img-option" @click="selectAvatar(pandaUrl)">
               <img :src="pandaUrl" />
             </button>
-            <button class="avatar-option img-option" @click="selectAvatar(bossUrl)">
+            <button v-if="bossUrl" class="avatar-option img-option" @click="selectAvatar(bossUrl)">
               <img :src="bossUrl" />
             </button>
           </div>
@@ -106,18 +106,31 @@
 
 <script setup>
 import { useGameStore } from '@/stores/gameStore';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const store = useGameStore();
 const showAvatarModal = ref(false);
 
-// Assets
-const pandaUrl = new URL('@/assets/panda_idle.png', import.meta.url).href;
-const bossUrl = new URL('@/assets/boss_idle.webp', import.meta.url).href;
+// Initialize asset URLs safely
+const pandaUrl = ref('');
+const bossUrl = ref('');
+
+onMounted(() => {
+  try {
+    pandaUrl.value = new URL('@/assets/panda_idle.png', import.meta.url).href;
+    bossUrl.value = new URL('@/assets/boss_idle.webp', import.meta.url).href;
+  } catch (e) {
+    console.error("Error loading assets:", e);
+    // Fallback or handle missing assets
+  }
+});
 
 const emojiAvatars = ['🐼', '🐱', '🦊', '🐸', '🐯', '🐙', '🦄', '🐲', '👩‍💻', '👨‍💻', '🥷', '🎎'];
 
-const isImage = (val) => val.includes('/') || val.includes('http');
+const isImage = (val) => {
+    if (!val) return false;
+    return val.includes('/') || val.includes('http');
+};
 
 const selectAvatar = (val) => {
   store.avatar = val;
@@ -130,7 +143,6 @@ const confirmReset = () => {
   }
 };
 
-// Random Style für Blütenblätter
 const getPetalStyle = (n) => ({
   left: Math.random() * 100 + '%',
   animationDelay: Math.random() * 5 + 's',
@@ -140,13 +152,13 @@ const getPetalStyle = (n) => ({
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600&display=swap');
-@import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap'); /* Japanische Rundschrift */
+@import url('https://fonts.googleapis.com/css2?family=Kosugi+Maru&display=swap');
 
 .profile-page {
   width: 100%; min-height: 100vh;
   background: radial-gradient(circle at top, #fff9c4 0%, #ffccbc 100%);
   font-family: 'Fredoka', 'Kosugi Maru', sans-serif;
-  color: #5d4037; /* Weiches Braun statt Schwarz */
+  color: #5d4037;
   padding-bottom: 80px;
   overflow-x: hidden;
 }
@@ -177,7 +189,7 @@ const getPetalStyle = (n) => ({
 }
 
 .card-header {
-  background: #ffab91; /* Pfirsich */
+  background: #ffab91;
   padding: 15px; text-align: center;
   border-bottom: 4px solid #fff;
 }
@@ -196,7 +208,7 @@ const getPetalStyle = (n) => ({
 
 .avatar-circle {
   width: 120px; height: 120px;
-  background: #fff; border: 6px solid #4fc3f7; /* Hellblauer Rahmen */
+  background: #fff; border: 6px solid #4fc3f7;
   border-radius: 50%;
   display: flex; justify-content: center; align-items: center;
   box-shadow: 0 8px 0 rgba(79, 195, 247, 0.3);
