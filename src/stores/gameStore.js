@@ -13,7 +13,6 @@ export const useGameStore = defineStore('game', () => {
       unlocked: true, completed: false, stars: 0, 
       title: "Der Anfang aller Dinge", 
       bgTheme: "theme-sakura", 
-      // Level 1 hat keine Waypoints, da es der Start ist
       waypoints: [], 
       theory: {
         title: "Lektion 1: Variablen & Datentypen",
@@ -98,7 +97,6 @@ export const useGameStore = defineStore('game', () => {
       unlocked: false, completed: false, stars: 0, 
       title: "Die Kunst der Balance", 
       bgTheme: "theme-sakura", 
-      // Wegpunkte von Lvl 1 -> Lvl 2 (Nach unten)
       waypoints: [
       { x: 427, y: 651 },
       { x: 208, y: 851 },
@@ -177,7 +175,6 @@ boolean kannKämpfen = (energie > 0) && !istBesiegt; // true`
       unlocked: false, completed: false, stars: 0, 
       title: "Der Pfad der Entscheidung", 
       bgTheme: "theme-sakura",
-      // Wegpunkte von Lvl 2 -> Lvl 3 (Steil nach oben)
       waypoints: [
         { x: 803, y: 1254 },
       { x: 928, y: 1121 },
@@ -255,7 +252,6 @@ if (note == 1) {
       unlocked: false, completed: false, stars: 0, 
       title: "Die Halle der tausend Türen", 
       bgTheme: "theme-sakura",
-      // Wegpunkte von Lvl 3 -> Lvl 4 (Steil nach unten)
       waypoints: [
       { x: 1198, y: 336 },
       { x: 1275, y: 451 },
@@ -334,7 +330,6 @@ switch (tag) {
       unlocked: false, completed: false, stars: 0, 
       title: "Der Kreis und die Armee", 
       bgTheme: "theme-sakura",
-      // Wegpunkte von Lvl 4 -> Lvl 5 (Nach oben)
       waypoints: [
       { x: 1602, y: 1250 },
       { x: 1712, y: 1200 },
@@ -402,21 +397,48 @@ for (int i = 0; i < ninjas.length; i++) {
       id: 6, 
       x: 2150, y: 265, 
       unlocked: false, completed: false, stars: 0, 
-      title: "Meisterprüfung", 
+      title: "Der Großmeister", 
       isBoss: true, 
-      bgTheme: "theme-sakura",
-      // Wegpunkte von Lvl 5 -> Lvl 6 (Nach rechts oben)
+      bgTheme: "theme-boss", 
       waypoints: [
-         { x: 1858, y: 510 },
-      { x: 1878, y: 454 },
-      { x: 1910, y: 397 },
-      { x: 1959, y: 360 },
-      { x: 2007, y: 336 },
-      { x: 2044, y: 328 },
-      { x: 2109, y: 316 }
+        { x: 1858, y: 510 },
+        { x: 1878, y: 454 },
+        { x: 1910, y: 397 },
+        { x: 1959, y: 360 },
+        { x: 2007, y: 336 },
+        { x: 2044, y: 328 },
+        { x: 2109, y: 316 }
       ],
-      theory: { title: "Das Finale", content: "Besiege den Bug!", code: "" }, 
-      tasks: [] 
+      theory: { 
+        title: "Finale Prüfung", 
+        content: "Der Meister wartet...", 
+        code: "" 
+      }, 
+      // === BOSS DATA ===
+      bossData: {
+        name: "GROSSMEISTER NULL", 
+        health: 3,
+        timeSeconds: 120, // 2 minutes
+        dialogues: [
+          "Endlich bist du angekommen.",
+          "Aber rohe Kraft allein reicht hier nicht.",
+          "Dein Code muss fließen wie Tinte auf Reispapier.",
+          "Zeig mir: Beherrschst du den Pfad der Iteration?"
+        ],
+        taunts: [
+          "Dein Geist ist leer wie 'null'!", 
+          "Zu langsam! Der Compiler wartet nicht!", 
+          "Das nennst du Code? Das ist Chaos!", 
+          "Vergiss das Semikolon nicht, Schüler!", 
+          "Dein Algorithmus hat keine Ehre!",
+          "Tick tack... Die Garbage Collection kommt..."
+        ],
+        task: {
+          question: "Schreibe eine for-Schleife, die von 0 bis 20 (inklusive) in 2er-Schritten zählt (i+=2).",
+          correctRegex: /for\s*\(\s*int\s+i\s*=\s*0\s*;\s*i\s*<=\s*20\s*;\s*i\s*\+=\s*2\s*\)/
+        }
+      },
+      tasks: [] // Empty, as we use bossData
     },
   ]);
 

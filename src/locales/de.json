@@ -1,14 +1,27 @@
 {
-  "ui": {
-    "runButton": "Code ausführen",
-    "nextLevel": "Nächstes Level",
-    "loading": "Laden..."
+  "level": "Level",
+  "boss": {
+    "name": "PROFESSOR NULLPOINTER",
+    "click_hint": "KLICKEN ZUM FORTFAHREN >>",
+    "placeholder": "Code eingeben...",
+    "attack_btn": "KOMPILIEREN & ANGRIFF",
+    "victory": "SIEG",
+    "victory_desc": "System gehackt. Zugriff gewährt.",
+    "xp": "+1000 XP",
+    "exit": "SYSTEM VERLASSEN",
+    "fatal_error": "KRITISCHER FEHLER",
+    "error_desc": "NullPointerException in skill.Level",
+    "reboot": "DOJO NEUSTARTEN"
   },
-  "levels": {
-    "1": {
-      "title": "Einführung in Java",
-      "theory": "Java ist eine objektorientierte Sprache...",
-      "task": "Drucke 'Hallo Welt' auf den Bildschirm."
-    }
+  "theory": {
+    "test_btn": "Wissen testen"
+  },
+  "game": {
+    "task_prefix": "Aufgabe",
+    "good_job": "Gut gemacht!",
+    "next": "Weiter",
+    "oh_no": "Oh nein!",
+    "back": "Zurück",
+    "check": "Überprüfen"
   }
 }
