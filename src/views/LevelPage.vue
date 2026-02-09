@@ -204,14 +204,14 @@
 
         </div>
       </div>
-    </template> </div>
+    </template> 
+  </div>
 </template>
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
 import { computed, ref, onMounted } from 'vue';
 import { useGameStore } from '@/stores/gameStore';
-// 1. ИМПОРТИРУЕМ БОССА (Предполагаем, что создадим его на следующем шаге)
 import BossBattle from '@/components/BossBattle.vue';
 
 const route = useRoute();
@@ -501,8 +501,8 @@ onMounted(() => {
   transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 .big-star-svg.filled {
-  color: inherit;
-  fill: url(#bigGold); /* Uses SVG defs */
+  color: #FFD700; /* Force gold color */
+  fill: #FFD700;  /* Ensure fill is also gold */
   filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.8));
   transform: scale(1.2);
 }

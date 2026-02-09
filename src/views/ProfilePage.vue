@@ -111,7 +111,6 @@ import { ref, onMounted } from 'vue';
 const store = useGameStore();
 const showAvatarModal = ref(false);
 
-// Initialize asset URLs safely
 const pandaUrl = ref('');
 const bossUrl = ref('');
 
@@ -121,11 +120,15 @@ onMounted(() => {
     bossUrl.value = new URL('@/assets/boss_idle.webp', import.meta.url).href;
   } catch (e) {
     console.error("Error loading assets:", e);
-    // Fallback or handle missing assets
   }
 });
 
-const emojiAvatars = ['🐼', '🐱', '🦊', '🐸', '🐯', '🐙', '🦄', '🐲', '👩‍💻', '👨‍💻', '🥷', '🎎'];
+// Новые, более азиатские аватарки
+const emojiAvatars = [
+  '🐼', '🎋', '👺', '🌸', 
+  '🎎', '🏮', '🍙', '🍣', 
+  '🥢', '🐉', '🥷', '🧘'
+];
 
 const isImage = (val) => {
     if (!val) return false;
@@ -133,7 +136,7 @@ const isImage = (val) => {
 };
 
 const selectAvatar = (val) => {
-  store.avatar = val;
+  store.avatar = val; // Это должно работать, если store настроен правильно
   showAvatarModal.value = false;
 };
 

@@ -5,6 +5,8 @@ export const useGameStore = defineStore('game', () => {
   const playerName = ref('Java Schüler');
   const cameraPos = ref({ x: 0, y: 0 });
   const mascotStage = ref(1); 
+  // HINZUGEFÜGT: Avatar State (Standard ist Panda)
+  const avatar = ref('🐼');
 
   const levels = ref([
     { 
@@ -448,6 +450,14 @@ for (int i = 0; i < ninjas.length; i++) {
     return Math.round((levels.value.filter(l => l.completed).length / levels.value.length) * 100);
   });
   
+  // HINZUGEFÜGT: Rang basierend auf Sternen
+  const rank = computed(() => {
+    if (totalStars.value >= 15) return "Code Sensei (S)";
+    if (totalStars.value >= 10) return "Cyber Ninja (A)";
+    if (totalStars.value >= 5) return "Java Ronin (B)";
+    return "Novice (C)";
+  });
+
   const currentLevelId = computed(() => {
     const next = levels.value.find(l => l.unlocked && !l.completed);
     return next ? next.id : levels.value[levels.value.length - 1].id;
@@ -477,30 +487,36 @@ for (int i = 0; i < ninjas.length; i++) {
     });
     mascotStage.value = 1;
     cameraPos.value = { x: 0, y: 0 };
+    avatar.value = '🐼'; // Avatar auch zurücksetzen
   }
 
   const savedState = localStorage.getItem('java-game-store-v9');
   if (savedState) {
     const parsed = JSON.parse(savedState);
-    levels.value.forEach(l => {
-      const savedLvl = parsed.levels.find(sl => sl.id === l.id);
-      if (savedLvl) {
-        l.unlocked = savedLvl.unlocked;
-        l.completed = savedLvl.completed;
-        l.stars = savedLvl.stars;
-      }
-    });
+    if (parsed.levels) {
+        levels.value.forEach(l => {
+            const savedLvl = parsed.levels.find(sl => sl.id === l.id);
+            if (savedLvl) {
+                l.unlocked = savedLvl.unlocked;
+                l.completed = savedLvl.completed;
+                l.stars = savedLvl.stars;
+            }
+        });
+    }
     if (parsed.playerName) playerName.value = parsed.playerName;
     if (parsed.mascotStage) mascotStage.value = parsed.mascotStage;
+    if (parsed.avatar) avatar.value = parsed.avatar;
   }
 
-  watch([levels, playerName, mascotStage], () => {
+  // WICHTIG: 'avatar' zum Watcher hinzufügen, damit es gespeichert wird!
+  watch([levels, playerName, mascotStage, avatar], () => {
     localStorage.setItem('java-game-store-v9', JSON.stringify({
       levels: levels.value,
       playerName: playerName.value,
-      mascotStage: mascotStage.value
+      mascotStage: mascotStage.value,
+      avatar: avatar.value
     }));
   }, { deep: true });
 
-  return { levels, totalStars, progressPercent, currentLevelId, activeLevelData, completeLevel, cameraPos, setCamera, playerName, mascotStage, resetProgress };
+  return { levels, totalStars, progressPercent, currentLevelId, activeLevelData, completeLevel, cameraPos, setCamera, playerName, mascotStage, resetProgress, avatar, rank };
 });
