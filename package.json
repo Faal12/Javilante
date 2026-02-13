@@ -11,6 +11,7 @@
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
+    "esbuild": "^0.27.3",
     "pinia": "^3.0.4",
     "vue": "^3.5.26",
     "vue-i18n": "^11.2.8",

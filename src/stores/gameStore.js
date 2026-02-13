@@ -1,14 +1,41 @@
 import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 
+// 🔥 ВОТ ЭТО будет во 2-м файле (отдельный файл карты 2)
+import { createMap2Levels } from '@/data/map2Levels';
+
 export const useGameStore = defineStore('game', () => {
   const playerName = ref('Java Schüler');
   const cameraPos = ref({ x: 0, y: 0 });
-  const mascotStage = ref(1); 
+
+  // 1 = малыш, 2 = ученик, 3 = программист
+  const mascotStage = ref(1);
+
   // HINZUGEFÜGT: Avatar State (Standard ist Panda)
   const avatar = ref('🐼');
 
-  const levels = ref([
+  // ✅ Какая карта активна сейчас
+  const currentMapId = ref(1);
+
+  /**
+   * ✅ Флаг “перехода карты” (Angry Birds стиль)
+   * MapPage потом будет читать это и играть анимацию/свайп.
+   */
+  const mapTransition = ref({
+    active: false,
+    from: 1,
+    to: 1,
+    // можно использовать в UI (например направление)
+    direction: 'right'
+  });
+
+  /**
+   * =========================
+   * MAP 1 (твоя текущая карта)
+   * =========================
+   * ОСТАВЛЕНО ПРАКТИЧЕСКИ 1:1
+   */
+  const map1Levels = ref([
     { 
       id: 1, 
       x: 450, y: 460, 
@@ -93,6 +120,7 @@ export const useGameStore = defineStore('game', () => {
         }
       ]
     },
+
     { 
       id: 2, 
       x: 650, y: 1250, 
@@ -100,12 +128,46 @@ export const useGameStore = defineStore('game', () => {
       title: "Die Kunst der Balance", 
       bgTheme: "theme-sakura", 
       waypoints: [
-      { x: 427, y: 651 },
-      { x: 208, y: 851 },
-      { x: 225, y: 1028 },
-      { x: 338, y: 1129 },
-      { x: 446, y: 1243 },
-      { x: 564, y: 1293 }
+        {
+        "x": 477,
+        "y": 588
+      },
+      {
+        "x": 398,
+        "y": 661
+      },
+      {
+        "x": 294,
+        "y": 727
+      },
+      {
+        "x": 216,
+        "y": 804
+      },
+      {
+        "x": 180,
+        "y": 863
+      },
+      {
+        "x": 192,
+        "y": 951
+      },
+      {
+        "x": 247,
+        "y": 1055
+      },
+      {
+        "x": 347,
+        "y": 1130
+      },
+      {
+        "x": 458,
+        "y": 1264
+      },
+      {
+        "x": 578,
+        "y": 1311
+      }
       ],
       theory: {
         title: "Lektion 2: Operatoren einsetzen",
@@ -171,6 +233,7 @@ boolean kannKämpfen = (energie > 0) && !istBesiegt; // true`
         }
       ]
     },
+
     { 
       id: 3, 
       x: 1000, y: 250, 
@@ -178,15 +241,42 @@ boolean kannKämpfen = (energie > 0) && !istBesiegt; // true`
       title: "Der Pfad der Entscheidung", 
       bgTheme: "theme-sakura",
       waypoints: [
-        { x: 803, y: 1254 },
-      { x: 928, y: 1121 },
-      { x: 922, y: 965 },
-      { x: 896, y: 826 },
-      { x: 862, y: 695 },
-      { x: 855, y: 541 },
-      { x: 864, y: 421 },
-      { x: 916, y: 344 },
-      { x: 959, y: 318 }
+        {
+        "x": 803,
+        "y": 1254
+      },
+      {
+        "x": 928,
+        "y": 1121
+      },
+      {
+        "x": 922,
+        "y": 965
+      },
+      {
+        "x": 896,
+        "y": 826
+      },
+      {
+        "x": 862,
+        "y": 695
+      },
+      {
+        "x": 855,
+        "y": 541
+      },
+      {
+        "x": 864,
+        "y": 421
+      },
+      {
+        "x": 916,
+        "y": 344
+      },
+      {
+        "x": 959,
+        "y": 318
+      }
       ],
       theory: {
         title: "Lektion 3: Verzweigungen mit if/else",
@@ -248,6 +338,7 @@ if (note == 1) {
         }
       ]
     },
+
     { 
       id: 4, 
       x: 1450, y: 1220, 
@@ -255,17 +346,50 @@ if (note == 1) {
       title: "Die Halle der tausend Türen", 
       bgTheme: "theme-sakura",
       waypoints: [
-      { x: 1198, y: 336 },
-      { x: 1275, y: 451 },
-      { x: 1279, y: 557 },
-      { x: 1271, y: 678 },
-      { x: 1237, y: 773 },
-      { x: 1220, y: 904 },
-      { x: 1220, y: 1021 },
-      { x: 1235, y: 1112 },
-      { x: 1286, y: 1181 },
-      { x: 1334, y: 1218 },
-      { x: 1420, y: 1251 }
+        {
+        "x": 1198,
+        "y": 336
+      },
+      {
+        "x": 1275,
+        "y": 451
+      },
+      {
+        "x": 1279,
+        "y": 557
+      },
+      {
+        "x": 1271,
+        "y": 678
+      },
+      {
+        "x": 1237,
+        "y": 773
+      },
+      {
+        "x": 1220,
+        "y": 904
+      },
+      {
+        "x": 1220,
+        "y": 1021
+      },
+      {
+        "x": 1235,
+        "y": 1112
+      },
+      {
+        "x": 1286,
+        "y": 1181
+      },
+      {
+        "x": 1334,
+        "y": 1218
+      },
+      {
+        "x": 1420,
+        "y": 1251
+      }
       ],
       theory: {
         title: "Lektion 4: Die Switch-Case Anweisung",
@@ -326,6 +450,7 @@ switch (tag) {
         }
       ]
     },
+
     { 
       id: 5, 
       x: 1800, y: 550, 
@@ -333,15 +458,42 @@ switch (tag) {
       title: "Der Kreis und die Armee", 
       bgTheme: "theme-sakura",
       waypoints: [
-      { x: 1602, y: 1250 },
-      { x: 1712, y: 1200 },
-      { x: 1784, y: 1119 },
-      { x: 1812, y: 1029 },
-      { x: 1830, y: 934 },
-      { x: 1835, y: 864 },
-      { x: 1851, y: 761 },
-      { x: 1846, y: 689 },
-      { x: 1849, y: 638 }
+        {
+        "x": 1602,
+        "y": 1250
+      },
+      {
+        "x": 1712,
+        "y": 1200
+      },
+      {
+        "x": 1784,
+        "y": 1119
+      },
+      {
+        "x": 1812,
+        "y": 1029
+      },
+      {
+        "x": 1830,
+        "y": 934
+      },
+      {
+        "x": 1835,
+        "y": 864
+      },
+      {
+        "x": 1851,
+        "y": 761
+      },
+      {
+        "x": 1846,
+        "y": 689
+      },
+      {
+        "x": 1849,
+        "y": 638
+      }
       ],
       theory: {
         title: "Lektion 5: Arrays & Schleifen",
@@ -395,6 +547,7 @@ for (int i = 0; i < ninjas.length; i++) {
         }
       ]
     },
+
     { 
       id: 6, 
       x: 2150, y: 265, 
@@ -403,54 +556,152 @@ for (int i = 0; i < ninjas.length; i++) {
       isBoss: true, 
       bgTheme: "theme-boss", 
       waypoints: [
-        { x: 1858, y: 510 },
-        { x: 1878, y: 454 },
-        { x: 1910, y: 397 },
-        { x: 1959, y: 360 },
-        { x: 2007, y: 336 },
-        { x: 2044, y: 328 },
-        { x: 2109, y: 316 }
+        {
+        "x": 1858,
+        "y": 510
+      },
+      {
+        "x": 1878,
+        "y": 454
+      },
+      {
+        "x": 1910,
+        "y": 397
+      },
+      {
+        "x": 1959,
+        "y": 360
+      },
+      {
+        "x": 2007,
+        "y": 336
+      },
+      {
+        "x": 2044,
+        "y": 328
+      },
+      {
+        "x": 2109,
+        "y": 316
+      }
       ],
       theory: { 
         title: "Finale Prüfung", 
         content: "Der Meister wartet...", 
         code: "" 
       }, 
-      // === BOSS DATA ===
       bossData: {
-        name: "GROSSMEISTER NULL", 
-        health: 3,
-        timeSeconds: 120, // 2 minutes
-        dialogues: [
-          "Endlich bist du angekommen.",
-          "Aber rohe Kraft allein reicht hier nicht.",
-          "Dein Code muss fließen wie Tinte auf Reispapier.",
-          "Zeig mir: Beherrschst du den Pfad der Iteration?"
-        ],
-        taunts: [
-          "Dein Geist ist leer wie 'null'!", 
-          "Zu langsam! Der Compiler wartet nicht!", 
-          "Das nennst du Code? Das ist Chaos!", 
-          "Vergiss das Semikolon nicht, Schüler!", 
-          "Dein Algorithmus hat keine Ehre!",
-          "Tick tack... Die Garbage Collection kommt..."
-        ],
-        task: {
-          question: "Schreibe eine for-Schleife, die von 0 bis 20 (inklusive) in 2er-Schritten zählt (i+=2).",
-          correctRegex: /for\s*\(\s*int\s+i\s*=\s*0\s*;\s*i\s*<=\s*20\s*;\s*i\s*\+=\s*2\s*\)/
-        }
-      },
-      tasks: [] // Empty, as we use bossData
+  name: 'Sakura Grandmaster',
+  timeSeconds: 150,
+  health: 3,
+
+  dialogues: [
+    'Oh. Du schon wieder. Ich dachte, der Compiler hätte dich längst verjagt.',
+    'Regeln sind simpel: Drei Zauber. Drei Treffer. Keine Ausreden, kein „bei mir läuft’s aber“. ',
+    'Wenn du sauber triffst, lasse ich dich zur nächsten Karte. Wenn nicht… nun ja. 🌸'
+  ],
+
+  // Рандомные, как атмосферный шум (остаются)
+  taunts: [
+    'Das war… fast Code. Wirklich fast.',
+    'Dein Stil ist wie ein unbenutzter Import: unnötig.',
+    'Ich rieche NullPointerException in der Luft.',
+    'Du kämpfst gegen mich — und verlierst gegen Klammern.',
+    'Konzentrier dich. Oder nenn es wenigstens „kreativen Fehler“.'
+  ],
+
+  // ✅ ВАЖНО: новые “мгновенные” фразы на событие
+  tauntsOnHit: [
+    'Hmpf. Ein Treffer. Du lernst ja doch… minimal.',
+    'Sauber. Das tut weh. Mach’s noch zweimal.',
+    'Okay, das war korrekt. Ich hasse das.'
+  ],
+  tauntsOnMiss: [
+    'Falsch. Der Compiler weint. Ich auch — vor Lachen.',
+    'Du wolltest Java schreiben, nicht Hieroglyphen.',
+    'Nope. Versuch’s nochmal, bevor ich einschlafe.',
+    'Klammern? Semikolon? Irgendwas? Hallo?',
+    'Du hast gerade „Bug-Fu“ eingesetzt. Leider gegen dich selbst.'
+  ],
+
+  tasks: [
+  {
+    // ✅ 1 строка: объявление переменной
+    type: "input",
+    question:
+      "Phase 1 — Variable:\n" +
+      "Deklariere eine int-Variable mit dem Namen score und dem Startwert 10.\n" +
+      "Schreibe NUR diese eine Zeile.",
+    // принимает: int score=10; / int score = 10;
+    correctRegex: /^\s*int\s+score\s*=\s*10\s*;?\s*$/m,
+    hint:
+      "Tipp: Datentyp, Name, Gleichzeichen, Wert.",
+    solution:
+      "int score = 10;"
+  },
+
+  {
+    // ✅ 1 строка: if-Bedingung (без тела)
+    type: "input",
+    question:
+      "Phase 2 — Bedingung:\n" +
+      "Schreibe NUR die Bedingung (ohne if), die true ist, wenn hp kleiner oder gleich 0 ist.",
+    // принимает: hp<=0 / hp <= 0
+    correctRegex: /^\s*\(?\s*hp\s*<=\s*0\s*\)?\s*;?\s*$/m,
+    hint:
+      "Tipp: „kleiner oder gleich“ ist <= .",
+    solution:
+      "hp <= 0"
+  },
+
+  {
+    // ✅ 1 строка: for-loop header
+    type: "input",
+    question:
+      "Phase 3 — Schleife:\n" +
+      "Schreibe NUR den for-Header, der i von 1 bis 3 laufen lässt.\n" +
+      "(Also: i startet bei 1 und endet bei 3.)",
+    // принимает: for(int i=1;i<=3;i++) / for (int i = 1; i <= 3; i++)
+    correctRegex: /^\s*for\s*\(\s*int\s+i\s*=\s*1\s*;\s*i\s*<=\s*3\s*;\s*i\s*\+\+\s*\)\s*;?\s*$/m,
+    hint:
+      "Tipp: Start 1, Bedingung <= 3, Schritt i++.",
+    solution:
+      "for (int i = 1; i <= 3; i++)"
+  }
+]
+
+}
+,
+      tasks: []
     },
   ]);
 
-  const totalStars = computed(() => levels.value.reduce((sum, lvl) => sum + lvl.stars, 0));
+  /**
+   * =========================
+   * MAP 2 (НОВАЯ КАРТА)
+   * =========================
+   */
+  const map2Levels = ref(createMap2Levels());
+
+  /**
+   * ✅ Открыта ли карта 2 (для выбора карты вручную)
+   */
+  const map2Unlocked = computed(() => {
+    const first = map2Levels.value?.find(l => l.id === 1);
+    return !!first?.unlocked;
+  });
+
+  const levels = computed(() => {
+    return currentMapId.value === 1 ? map1Levels.value : map2Levels.value;
+  });
+
+  const totalStars = computed(() => levels.value.reduce((sum, lvl) => sum + (lvl.stars || 0), 0));
+
   const progressPercent = computed(() => {
     if (levels.value.length === 0) return 0;
     return Math.round((levels.value.filter(l => l.completed).length / levels.value.length) * 100);
   });
-  
-  // HINZUGEFÜGT: Rang basierend auf Sternen
+
   const rank = computed(() => {
     if (totalStars.value >= 15) return "Code Sensei (S)";
     if (totalStars.value >= 10) return "Cyber Ninja (A)";
@@ -465,58 +716,172 @@ for (int i = 0; i < ninjas.length; i++) {
 
   const activeLevelData = (id) => levels.value.find(l => l.id === parseInt(id));
 
-  function completeLevel(levelId, starsCount) {
-    const level = levels.value.find(l => l.id === levelId);
-    if (level) {
-      level.completed = true;
-      if (starsCount > level.stars) level.stars = starsCount;
-      const nextLevel = levels.value.find(l => l.id === levelId + 1);
-      if (nextLevel) nextLevel.unlocked = true;
-      if (level.isBoss) mascotStage.value = 3;
-      else if (levelId === 3) mascotStage.value = 2;
-    }
+  function setCamera(x, y) {
+    cameraPos.value = { x, y };
   }
 
-  function setCamera(x, y) { cameraPos.value = { x, y }; }
-  
   function resetProgress() {
-    levels.value.forEach((l, index) => {
+    map1Levels.value.forEach((l, index) => {
       l.unlocked = index === 0;
       l.completed = false;
       l.stars = 0;
     });
+
+    map2Levels.value = createMap2Levels();
+    map2Levels.value.forEach((l, index) => {
+      l.unlocked = index === 0;
+      l.completed = false;
+      l.stars = 0;
+    });
+
+    currentMapId.value = 1;
     mascotStage.value = 1;
     cameraPos.value = { x: 0, y: 0 };
-    avatar.value = '🐼'; // Avatar auch zurücksetzen
+    avatar.value = '🐼';
+
+    mapTransition.value = { active: false, from: 1, to: 1, direction: 'right' };
   }
 
-  const savedState = localStorage.getItem('java-game-store-v9');
-  if (savedState) {
-    const parsed = JSON.parse(savedState);
-    if (parsed.levels) {
-        levels.value.forEach(l => {
-            const savedLvl = parsed.levels.find(sl => sl.id === l.id);
-            if (savedLvl) {
-                l.unlocked = savedLvl.unlocked;
-                l.completed = savedLvl.completed;
-                l.stars = savedLvl.stars;
-            }
-        });
+  function startMapTransition(toMapId) {
+    const from = currentMapId.value;
+
+    if (toMapId === 2 && !map2Unlocked.value) return;
+
+    mapTransition.value = {
+      active: true,
+      from,
+      to: toMapId,
+      direction: toMapId > from ? 'right' : 'left'
+    };
+  }
+
+  function finishMapTransition() {
+    if (!mapTransition.value.active) return;
+    currentMapId.value = mapTransition.value.to;
+    mapTransition.value.active = false;
+  }
+
+  function requestMapSwitch(toMapId) {
+    if (toMapId === currentMapId.value) return;
+    startMapTransition(toMapId);
+  }
+
+  function completeLevel(levelId, starsCount) {
+    const level = levels.value.find(l => l.id === levelId);
+    if (!level) return;
+
+    level.completed = true;
+    if (starsCount > (level.stars || 0)) level.stars = starsCount;
+
+    const nextLevel = levels.value.find(l => l.id === levelId + 1);
+    if (nextLevel) nextLevel.unlocked = true;
+
+    if (level.isBoss) mascotStage.value = 3;
+    else if (levelId === 3 && currentMapId.value === 1) mascotStage.value = 2;
+
+    if (currentMapId.value === 1 && level.isBoss) {
+      const m2first = map2Levels.value.find(l => l.id === 1);
+      if (m2first) m2first.unlocked = true;
+      startMapTransition(2);
     }
-    if (parsed.playerName) playerName.value = parsed.playerName;
-    if (parsed.mascotStage) mascotStage.value = parsed.mascotStage;
-    if (parsed.avatar) avatar.value = parsed.avatar;
   }
 
-  // WICHTIG: 'avatar' zum Watcher hinzufügen, damit es gespeichert wird!
-  watch([levels, playerName, mascotStage, avatar], () => {
-    localStorage.setItem('java-game-store-v9', JSON.stringify({
-      levels: levels.value,
-      playerName: playerName.value,
-      mascotStage: mascotStage.value,
-      avatar: avatar.value
-    }));
-  }, { deep: true });
+  const STORAGE_KEY = 'java-game-store-v10';
 
-  return { levels, totalStars, progressPercent, currentLevelId, activeLevelData, completeLevel, cameraPos, setCamera, playerName, mascotStage, resetProgress, avatar, rank };
+  const packProgress = (arr) => arr.map(l => ({
+    id: l.id,
+    unlocked: !!l.unlocked,
+    completed: !!l.completed,
+    stars: l.stars || 0
+  }));
+
+  const applyProgress = (arr, progress) => {
+    if (!Array.isArray(progress)) return;
+    arr.forEach(l => {
+      const saved = progress.find(p => p.id === l.id);
+      if (!saved) return;
+      l.unlocked = saved.unlocked;
+      l.completed = saved.completed;
+      l.stars = saved.stars;
+    });
+  };
+
+  const oldSaved = localStorage.getItem('java-game-store-v9');
+  const saved = localStorage.getItem(STORAGE_KEY);
+
+  if (saved) {
+    try {
+      const parsed = JSON.parse(saved);
+
+      if (parsed.playerName) playerName.value = parsed.playerName;
+      if (parsed.mascotStage) mascotStage.value = parsed.mascotStage;
+      if (parsed.avatar) avatar.value = parsed.avatar;
+
+      if (parsed.currentMapId) currentMapId.value = parsed.currentMapId;
+
+      if (parsed.map1Progress) applyProgress(map1Levels.value, parsed.map1Progress);
+      if (parsed.map2Progress) applyProgress(map2Levels.value, parsed.map2Progress);
+
+      if (parsed.mapTransition) mapTransition.value = parsed.mapTransition;
+
+    } catch (e) {}
+  } else if (oldSaved) {
+    try {
+      const parsed = JSON.parse(oldSaved);
+
+      if (parsed.playerName) playerName.value = parsed.playerName;
+      if (parsed.mascotStage) mascotStage.value = parsed.mascotStage;
+      if (parsed.avatar) avatar.value = parsed.avatar;
+
+      if (Array.isArray(parsed.levels)) {
+        applyProgress(map1Levels.value, parsed.levels);
+      }
+    } catch (e) {}
+  }
+
+  watch(
+    [playerName, mascotStage, avatar, currentMapId, mapTransition, map1Levels, map2Levels],
+    () => {
+      localStorage.setItem(
+        STORAGE_KEY,
+        JSON.stringify({
+          playerName: playerName.value,
+          mascotStage: mascotStage.value,
+          avatar: avatar.value,
+          currentMapId: currentMapId.value,
+          mapTransition: mapTransition.value,
+          map1Progress: packProgress(map1Levels.value),
+          map2Progress: packProgress(map2Levels.value),
+        })
+      );
+    },
+    { deep: true }
+  );
+
+  return {
+    playerName,
+    cameraPos,
+    mascotStage,
+    avatar,
+
+    currentMapId,
+    mapTransition,
+
+    map2Unlocked,
+
+    levels,
+    totalStars,
+    progressPercent,
+    rank,
+    currentLevelId,
+    activeLevelData,
+
+    completeLevel,
+    setCamera,
+    resetProgress,
+
+    startMapTransition,
+    finishMapTransition,
+    requestMapSwitch,
+  };
 });
