@@ -2,6 +2,9 @@ import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
 import { createMap2Levels } from '@/data/map2Levels';
 
+// 🔥 ВОТ ЭТО будет во 2-м файле (отдельный файл карты 2)
+import { createMap2Levels } from '@/data/map2Levels';
+
 export const useGameStore = defineStore('game', () => {
   const playerName = ref('Java Schüler');
   const cameraPos = ref({ x: 0, y: 0 });

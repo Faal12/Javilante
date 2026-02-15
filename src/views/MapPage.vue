@@ -113,7 +113,6 @@
       :style="worldStyle"
       :class="{ 'disable-input': overlayActive }"
     >
-
       <div class="world-bg" :class="mapThemeClass" :style="{ backgroundImage: `url(${activeBgUrl})` }"></div>
 
       <svg class="connections" :width="MAP_WIDTH" :height="MAP_HEIGHT">
@@ -740,9 +739,12 @@ onUnmounted(() => {
   z-index: 0;
 }
 
+/* (оставил твою стилизацию map2 как временную, пока не добавишь картинку) */
+
+
+/* Connections */
 .connections { position: absolute; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 .path-line { stroke: #fff; stroke-width: 8; stroke-linecap: round; fill: none; opacity: 0; stroke-dasharray: 15, 20; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); }
-
 
 .level-node {
   position: absolute;

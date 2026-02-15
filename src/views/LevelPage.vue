@@ -822,11 +822,9 @@ onMounted(() => {
   0%   { transform: translateY(-10vh) translateX(0) rotate(0deg); }
   100% { transform: translateY(110vh) translateX(var(--driftX, 140px)) rotate(540deg); }
 }
-
 .floating-leaves.p-spark .leaf{ filter: drop-shadow(0 6px 14px rgba(0,0,0,0.14)) saturate(1.2); }
 .floating-leaves.p-ember .leaf{ filter: drop-shadow(0 8px 16px rgba(0,0,0,0.18)) saturate(1.3); }
 .floating-leaves.p-spiral .leaf{ animation-timing-function: cubic-bezier(0.2,0.8,0.2,1); }
-
 
 .map2-stamp{
   position:absolute;
@@ -1325,6 +1323,7 @@ onMounted(() => {
 .game-actions { padding: 30px; text-align: center; height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 .feedback { color: #d32f2f; font-weight: bold; margin-bottom: 10px; font-size: 1.1rem; }
 
+/* Buttons */
 .primary-btn {
   background: var(--accent);
   color: white;

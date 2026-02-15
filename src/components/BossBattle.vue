@@ -15,6 +15,7 @@
       </div>
     </div>
 
+    <!-- INTRO -->
     <div v-if="phase === 'intro'" class="intro-layer" @click="advanceDialog">
       <div class="boss-summon-circle">
         <div class="mandala outer"></div>
@@ -40,9 +41,11 @@
       </div>
     </div>
 
+    <!-- FIGHT -->
     <div v-else-if="phase === 'fight'" class="fight-layer">
 
       <div class="battle-hud slide-down">
+        <!-- PLAYER -->
         <div class="player-stats">
           <div class="stat-label">DEINE ENERGIE</div>
           <div class="hearts-container player">
@@ -63,7 +66,6 @@
             Treffer: {{ bossMaxHp - bossHp }} / {{ bossMaxHp }}
           </div>
         </div>
-
 
         <div class="boss-timer" :class="{ critical: timeLeft < 20 }">
           <div class="timer-ring">
@@ -89,6 +91,7 @@
         </transition>
 
         <div class="boss-container">
+          <!-- projectile -->
           <transition name="projectile-fly">
             <div v-if="isAttacking" class="magic-projectile">🔥</div>
           </transition>
@@ -141,6 +144,7 @@
 
     </div>
 
+    <!-- RESULT -->
     <div v-else class="result-layer">
       <div class="victory-seal pop-in" :class="phase">
         <div class="seal-icon">{{ phase === 'win' ? '🏆' : '💀' }}</div>
@@ -205,12 +209,10 @@ const bossHp = ref(bossMaxHp.value);
 
 const currentBossTask = computed(() => bossTasks.value[taskIndex.value]);
 
-
 const timePercent = computed(() => {
   const total = props.bossData.timeSeconds || 120;
   return (timeLeft.value / total) * 100;
 });
-
 
 onMounted(() => startDialog());
 onUnmounted(() => clearIntervals());
@@ -220,7 +222,6 @@ function clearIntervals() {
   clearInterval(tauntInterval);
   clearInterval(typeInterval);
 }
-
 
 const getFireflyStyle = () => ({
   top: Math.random() * 100 + '%',
@@ -240,7 +241,6 @@ const getSparkStyle = (n) => {
     animationDelay: (Math.random() * 0.05) + 's'
   };
 };
-
 
 function startDialog() {
   if (!props.bossData.dialogues?.length) return startFight();
@@ -321,7 +321,6 @@ function triggerAttack() {
 
   if (isCorrect) {
     isAttacking.value = true;
-
 
     setTimeout(() => {
       isAttacking.value = false;
