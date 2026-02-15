@@ -123,7 +123,6 @@ onMounted(() => {
   }
 });
 
-// Новые, более азиатские аватарки
 const emojiAvatars = [
   '🐼', '🎋', '👺', '🌸', 
   '🎎', '🏮', '🍙', '🍣', 
@@ -136,7 +135,7 @@ const isImage = (val) => {
 };
 
 const selectAvatar = (val) => {
-  store.avatar = val; // Это должно работать, если store настроен правильно
+  store.avatar = val;
   showAvatarModal.value = false;
 };
 
@@ -166,7 +165,6 @@ const getPetalStyle = (n) => ({
   overflow-x: hidden;
 }
 
-/* === HINTERGRUND DEKO === */
 .bg-decor { position: fixed; inset: 0; pointer-events: none; z-index: 0; }
 .petal { position: absolute; top: -20px; font-size: 20px; animation: fall linear infinite; opacity: 0.7; }
 .cloud { position: absolute; font-size: 4rem; opacity: 0.8; animation: floatCloud 20s linear infinite; }
@@ -180,7 +178,6 @@ const getPetalStyle = (n) => ({
   width: 100%; max-width: 500px; margin: 0 auto;
 }
 
-/* === KARTE === */
 .profile-card {
   width: 100%;
   background: rgba(255, 255, 255, 0.9);
@@ -203,8 +200,6 @@ const getPetalStyle = (n) => ({
 }
 
 .card-body { padding: 30px 20px; }
-
-/* === AVATAR === */
 .avatar-section { display: flex; flex-direction: column; align-items: center; margin-bottom: 30px; }
 .avatar-wrapper { position: relative; cursor: pointer; transition: transform 0.2s; }
 .avatar-wrapper:hover { transform: scale(1.05) rotate(2deg); }
@@ -244,7 +239,6 @@ const getPetalStyle = (n) => ({
 }
 .name-input:focus { border-color: #ff7043; }
 
-/* === STATISTIK === */
 .stats-row { display: flex; gap: 15px; justify-content: space-between; margin-bottom: 30px; }
 .stat-bubble {
   flex: 1; padding: 15px; border-radius: 20px;
@@ -258,8 +252,6 @@ const getPetalStyle = (n) => ({
 .stat-bubble .icon { font-size: 1.5rem; margin-bottom: 5px; }
 .stat-bubble .value { font-size: 1.5rem; font-weight: bold; }
 .stat-bubble .label { font-size: 0.8rem; opacity: 0.8; }
-
-/* === LEVEL LISTE === */
 .divider { text-align: center; margin-bottom: 15px; opacity: 0.6; font-size: 0.9rem; letter-spacing: 1px; }
 .levels-scroll {
   background: #fff; border: 3px solid #d7ccc8; border-radius: 15px;
@@ -282,8 +274,6 @@ const getPetalStyle = (n) => ({
 .lvl-stars { font-size: 0.9rem; color: #ffca28; }
 .mini-star.filled { color: #ffb300; } 
 .mini-star { color: #e0e0e0; }
-
-/* === BUTTONS === */
 .reset-btn {
   width: 100%; margin-top: 25px; padding: 15px;
   background: #eceff1; color: #90a4ae; border: none;
@@ -292,7 +282,6 @@ const getPetalStyle = (n) => ({
 }
 .reset-btn:hover { background: #cfd8dc; color: #546e7a; }
 
-/* === MODAL === */
 .modal-overlay {
   position: fixed; inset: 0; background: rgba(0,0,0,0.5);
   backdrop-filter: blur(5px); z-index: 100;
@@ -325,7 +314,6 @@ const getPetalStyle = (n) => ({
 }
 .close-btn:active { transform: translateY(4px); box-shadow: none; }
 
-/* === ANIMATIONEN === */
 @keyframes fall { to { transform: translateY(100vh) rotate(360deg); } }
 @keyframes floatCloud { from { transform: translateX(100vw); } to { transform: translateX(-100%); } }
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }

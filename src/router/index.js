@@ -1,5 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomePage from '../views/HomePage.vue' // <--- 1. Импортируем новую страницу
+import HomePage from '../views/HomePage.vue'
 import MapPage from '../views/MapPage.vue'
 import LevelPage from '../views/LevelPage.vue'
 import ProfilePage from '../views/ProfilePage.vue'
@@ -8,12 +8,12 @@ const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path: '/', // Главная страница теперь здесь
+      path: '/',
       name: 'home',
       component: HomePage
     },
     {
-      path: '/map', // Карта переехала сюда
+      path: '/map',
       name: 'map',
       component: MapPage
     },

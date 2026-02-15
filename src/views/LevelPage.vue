@@ -1,8 +1,7 @@
-<!-- src/views/LevelPage.vue -->
+
 <template>
   <div class="level-page" :style="pageStyle" :class="pageClass">
 
-    <!-- ✅ Boss мод остаётся как есть -->
     <BossBattle
       v-if="isBossMode"
       :bossData="levelData.bossData"
@@ -10,7 +9,6 @@
     />
 
     <template v-else>
-      <!-- ✅ КАРТА 1: твой Sakura decor (НЕ ТРОГАЮ анимации/структуру) -->
       <div v-if="store.currentMapId === 1" class="sakura-decor">
         <div class="falling-petals">
           <span v-for="(style, index) in petalsStyles" :key="index" :style="style">🌸</span>
@@ -74,15 +72,12 @@
         </svg>
       </div>
 
-      <!-- ✅ КАРТА 2: “каждый уровень = перформанс” (Map1 не трогаем) -->
       <div v-else class="bamboo-decor" :class="map2DecorClass">
-        <!-- overlays for mood -->
         <div class="map2-colorgrade" :style="map2Fx.colorgradeStyle"></div>
         <div class="map2-motif" :class="map2Fx.motifClass"></div>
         <div class="map2-atmo" :class="map2Fx.atmoClass"></div>
         <div class="map2-setpiece" :class="map2Fx.setpieceClass"></div>
 
-        <!-- Dense bamboo background -->
         <div class="bamboo-field">
           <div
             v-for="(style, index) in bambooStalks"
@@ -285,19 +280,15 @@ const currentTask = computed(() => {
   return null;
 });
 
-/* ✅ темы карты */
 const mapThemeClass = computed(() => (store.currentMapId === 2 ? 'map2' : 'map1'));
 
-/* ✅ key темы для Map2: 1..6 (boss живёт отдельно) */
 const map2ThemeKey = computed(() => {
   if (store.currentMapId !== 2) return 1;
   const id = parseInt(levelId);
-  // нормальные уровни 1..6, если вдруг что — зажимаем
   const clamped = Math.max(1, Math.min(6, Number.isFinite(id) ? id : 1));
   return clamped;
 });
 
-/* ✅ классы для bamboo decor (оставляем v1..v4 как “мелкая вариативность”, плюс t1..t6 как тема) */
 const map2DecorClass = computed(() => {
   if (store.currentMapId !== 2) return '';
   const id = parseInt(levelId);
@@ -305,7 +296,6 @@ const map2DecorClass = computed(() => {
   return `v${v} t${map2ThemeKey.value}`;
 });
 
-/* ✅ ДИНАМИЧЕСКИЙ ФОН: НЕ ломаем Map1 */
 const bgStyle = computed(() => {
   const id = parseInt(levelId);
 
@@ -332,7 +322,6 @@ const bgStyle = computed(() => {
   return { background: chosen[id] || (store.currentMapId === 2 ? gradientsMap2[1] : gradientsMap1[1]) };
 });
 
-/* ✅ “перформанс” + акцент + форма печати/кнопок (ТОЛЬКО Map2) */
 const map2Fx = computed(() => {
   if (store.currentMapId !== 2) {
     return {
@@ -498,15 +487,12 @@ const map2Fx = computed(() => {
   return themes[map2ThemeKey.value] || themes[1];
 });
 
-/* ✅ итоговые классы/стили страницы */
 const pageClass = computed(() => [mapThemeClass.value, store.currentMapId === 2 ? `m2-theme-${map2ThemeKey.value}` : ''].join(' ').trim());
 const pageStyle = computed(() => ({ ...bgStyle.value, ...(store.currentMapId === 2 ? map2Fx.value.cssVars : {}) }));
 
-/* ✅ классы для “asian-seal” и акцентов UI */
 const sealClass = computed(() => {
   if (store.currentMapId !== 2) return '';
   const k = map2ThemeKey.value;
-  // разные формы печати
   if (k === 1) return 'seal-round seal-dojo';
   if (k === 2) return 'seal-squircle seal-origami';
   if (k === 3) return 'seal-hex seal-ink';
@@ -517,7 +503,6 @@ const sealClass = computed(() => {
 const accentBtnClass = computed(() => (store.currentMapId === 2 ? `accent-${map2ThemeKey.value}` : ''));
 const accentPillClass = computed(() => (store.currentMapId === 2 ? `accent-pill-${map2ThemeKey.value}` : ''));
 
-/* === ЛОГИКА БОССА === */
 const handleBossWin = () => {
   store.completeLevel(parseInt(levelId), 3);
 
@@ -530,7 +515,6 @@ const handleBossWin = () => {
   router.push('/map');
 };
 
-/* === ОРИГИНАЛЬНАЯ ЛОГИКА === */
 const petalsStyles = ref([]);
 const leavesStyles = ref([]);
 const bambooStalks = ref([]);
@@ -546,7 +530,6 @@ const initPetals = () => {
 };
 
 const initLeaves = () => {
-  // чуть варьируем по v1..v4, но “перформанс” идёт через atmo/setpiece
   const id = parseInt(levelId);
   const v = ((id - 1) % 4) + 1;
 
@@ -682,12 +665,10 @@ onMounted(() => {
   --text-dark: #3e2723;
 }
 
-/* ✅ Map2: базовые */
 .level-page.map2 {
   --text-dark: #102018;
 }
 
-/* === SAKURA DECOR (оставлено без изменений) === */
 .sakura-decor {
   position: absolute;
   top: 0; left: 0;
@@ -725,7 +706,6 @@ onMounted(() => {
 @keyframes sway-reverse { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-2deg); } }
 @keyframes fall { to { transform: translateY(110vh) rotate(720deg) translateX(100px); } }
 
-/* === MAP2: BAMBOO DECOR === */
 .bamboo-decor {
   position: absolute;
   inset: 0;
@@ -734,7 +714,6 @@ onMounted(() => {
   z-index: 0;
 }
 
-/* overlays */
 .map2-colorgrade{
   position:absolute; inset:0;
   z-index: 0;
@@ -759,7 +738,6 @@ onMounted(() => {
   mix-blend-mode: soft-light;
 }
 
-/* tiny themed hints (very subtle) */
 .map2-motif.motif-katana::before{
   background:
     linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0) 60%),
@@ -792,7 +770,6 @@ onMounted(() => {
   mix-blend-mode: screen;
 }
 
-/* ✅ Dense bamboo field */
 .bamboo-field {
   position: absolute;
   inset: 0;
@@ -830,7 +807,6 @@ onMounted(() => {
   50% { transform: translateX(-50%) rotate(1.6deg) scale(var(--scale, 1)); }
 }
 
-/* Leaves */
 .floating-leaves{
   position:absolute; inset:0;
   z-index: 5;
@@ -846,12 +822,12 @@ onMounted(() => {
   0%   { transform: translateY(-10vh) translateX(0) rotate(0deg); }
   100% { transform: translateY(110vh) translateX(var(--driftX, 140px)) rotate(540deg); }
 }
-/* extra feels per particle mode */
+
 .floating-leaves.p-spark .leaf{ filter: drop-shadow(0 6px 14px rgba(0,0,0,0.14)) saturate(1.2); }
 .floating-leaves.p-ember .leaf{ filter: drop-shadow(0 8px 16px rgba(0,0,0,0.18)) saturate(1.3); }
 .floating-leaves.p-spiral .leaf{ animation-timing-function: cubic-bezier(0.2,0.8,0.2,1); }
 
-/* Map2 stamp */
+
 .map2-stamp{
   position:absolute;
   left: 18px;
@@ -872,15 +848,11 @@ onMounted(() => {
   opacity: .95;
 }
 
-/* ✅ Variants per level for Map2 (оставил твои мелкие отличия) */
 .bamboo-decor.v1 .bamboo-svg { filter: drop-shadow(8px 14px 18px rgba(0,0,0,0.18)) saturate(1.05); }
 .bamboo-decor.v2 .bamboo-svg { filter: drop-shadow(8px 14px 18px rgba(0,0,0,0.18)) hue-rotate(-18deg) contrast(1.05); }
 .bamboo-decor.v3 .bamboo-svg { filter: drop-shadow(8px 14px 18px rgba(0,0,0,0.18)) hue-rotate(12deg) saturate(0.95) contrast(1.08); }
 .bamboo-decor.v4 .bamboo-svg { filter: drop-shadow(8px 14px 18px rgba(0,0,0,0.18)) hue-rotate(22deg) saturate(1.10); }
 
-/* =========================
-   MAP2 PERFORMANCE LAYERS
-   ========================= */
 .map2-atmo,
 .map2-setpiece{
   position:absolute;
@@ -888,7 +860,6 @@ onMounted(() => {
   pointer-events:none;
 }
 
-/* --- ATMO --- */
 .map2-atmo.atmo-sunrays{ z-index: 1; opacity: .9; }
 .map2-atmo.atmo-sunrays::before{
   content:"";
@@ -995,7 +966,6 @@ onMounted(() => {
   50%{ transform: translateY(-12px); }
 }
 
-/* --- SETPIECE --- */
 .map2-setpiece{ z-index: 4; opacity: .85; }
 
 .map2-setpiece.setpiece-torii::before{
@@ -1112,7 +1082,6 @@ onMounted(() => {
   50%{ transform: translateY(-12px); }
 }
 
-/* === GLASSMORPHISM UI === */
 .view-container {
   width: 100%; height: 100%;
   display: flex;
@@ -1152,7 +1121,6 @@ onMounted(() => {
   border-bottom-color: var(--accent-soft);
 }
 
-/* ✅ ASIAN SEAL: теперь “форма по теме” */
 .asian-seal {
   width: 54px; height: 54px;
   border: 3px solid var(--accent);
@@ -1183,7 +1151,6 @@ onMounted(() => {
   transform: rotate(-10deg);
 }
 
-/* forms */
 .asian-seal.seal-round{ border-radius: 50%; }
 .asian-seal.seal-squircle{ border-radius: 16px; }
 .asian-seal.seal-hex{
@@ -1209,7 +1176,6 @@ onMounted(() => {
   opacity: .7;
 }
 
-/* tiny themed details */
 .asian-seal.seal-dojo{ background: rgba(255,255,255,0.95); }
 .asian-seal.seal-origami::after{
   content:"";
@@ -1265,7 +1231,6 @@ onMounted(() => {
 
 .panel-footer { padding: 25px; text-align: center; border-top: 1px solid rgba(0,0,0,0.05); background: rgba(255,255,255,0.6); }
 
-/* --- GAME UI --- */
 .game-panel { max-width: 650px; }
 .game-top { padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(0,0,0,0.05); }
 
@@ -1284,7 +1249,6 @@ onMounted(() => {
 .game-content { padding: 40px; flex: 1; display: flex; flex-direction: column; justify-content: center; }
 .question { text-align: center; color: var(--text-dark); margin-bottom: 40px; font-size: 1.5rem; }
 
-/* Duolingo */
 .answer-zone {
   min-height: 80px;
   border-bottom: 2px solid var(--accent-border);
@@ -1312,7 +1276,6 @@ onMounted(() => {
 .tile.bank:hover { background: var(--accent-soft); }
 .tile.used { opacity: 0; pointer-events: none; }
 
-/* Quiz */
 .quiz-layout { display: flex; flex-direction: column; gap: 15px; }
 .quiz-card {
   background: white;
@@ -1336,12 +1299,10 @@ onMounted(() => {
 .quiz-card.selected .marker { background: var(--accent); border-color: var(--accent); }
 .quiz-card.error { background: #ffebee; border-color: #ff5252; animation: shake 0.4s; }
 
-/* Input */
 .input-container { display: flex; align-items: center; background: #282c34; border-radius: 12px; padding: 15px; }
 .code-input { background: transparent; border: none; color: #fff; font-family: 'Consolas', monospace; font-size: 1.2rem; width: 100%; outline: none; }
 .code-input.error { color: #ff5252; }
 
-/* RESULT SCREENS */
 .result-screen { text-align: center; padding: 40px; }
 .result-icon { font-size: 6rem; animation: bounce 2s infinite; display: block; margin-bottom: 10px; }
 .win h2 { color: #4caf50; }
@@ -1361,11 +1322,9 @@ onMounted(() => {
   transform: scale(1.2);
 }
 
-/* ACTIONS */
 .game-actions { padding: 30px; text-align: center; height: 100px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
 .feedback { color: #d32f2f; font-weight: bold; margin-bottom: 10px; font-size: 1.1rem; }
 
-/* Buttons */
 .primary-btn {
   background: var(--accent);
   color: white;
@@ -1384,11 +1343,9 @@ onMounted(() => {
 }
 .primary-btn:hover { transform: translateY(-3px); filter: brightness(1.06); }
 
-/* we keep your success/fail */
 .primary-btn.success { background: #4caf50; box-shadow: 0 8px 20px rgba(76, 175, 80, 0.3); }
 .primary-btn.fail { background: #d32f2f; box-shadow: 0 8px 20px rgba(211, 47, 47, 0.3); }
 
-/* ANIMATIONS */
 @keyframes shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-5px); } 75% { transform: translateX(5px); } }
 @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 </style>

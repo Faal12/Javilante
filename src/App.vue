@@ -34,7 +34,7 @@
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Fredoka:wght@400;600;700&display=swap');
 
-/* --- ШАПКА-НЕВИДИМКА --- */
+
 .game-nav {
   position: fixed;
   top: 0;
@@ -49,7 +49,6 @@
   transform: translateY(0);
 }
 
-/* --- ВНУТРЕННОСТЬ МЕНЮ --- */
 .nav-content {
   background: rgba(58, 46, 42, 0.95);
   border-bottom: 4px solid #d4a373;
@@ -67,7 +66,6 @@
   padding: 0 20px;
 }
 
-/* --- ЯЗЫЧОК (HANDLE) --- */
 .nav-handle {
   position: absolute;
   bottom: -35px;
@@ -102,23 +100,21 @@
   color: #8B4513;
 }
 
-/* --- ЛОГОТИП (ОБНОВЛЕННЫЙ) --- */
 .logo {
   font-family: 'Fredoka', sans-serif;
   font-size: 1.8rem;
   font-weight: 900;
   color: #FFD700;
   text-shadow: 2px 2px 0 #8B4513;
-  text-decoration: none; /* Убираем подчеркивание ссылки */
+  text-decoration: none; 
   cursor: pointer;
   transition: transform 0.2s;
 }
 
 .logo:hover {
-  transform: scale(1.05); /* Эффект при наведении */
+  transform: scale(1.05); 
 }
 
-/* --- КНОПКИ МЕНЮ --- */
 .nav-btn {
   text-decoration: none;
   background: white;
@@ -149,7 +145,6 @@
   box-shadow: 0 4px 0 #b8860b;
 }
 
-/* Анимации страниц */
 .fade-enter-active,
 .fade-leave-active {
   transition: opacity 0.3s ease;

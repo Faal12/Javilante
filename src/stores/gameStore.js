@@ -1,40 +1,20 @@
 import { defineStore } from 'pinia';
 import { ref, computed, watch } from 'vue';
-
-// 🔥 ВОТ ЭТО будет во 2-м файле (отдельный файл карты 2)
 import { createMap2Levels } from '@/data/map2Levels';
 
 export const useGameStore = defineStore('game', () => {
   const playerName = ref('Java Schüler');
   const cameraPos = ref({ x: 0, y: 0 });
-
-  // 1 = малыш, 2 = ученик, 3 = программист
   const mascotStage = ref(1);
-
-  // HINZUGEFÜGT: Avatar State (Standard ist Panda)
   const avatar = ref('🐼');
-
-  // ✅ Какая карта активна сейчас
   const currentMapId = ref(1);
-
-  /**
-   * ✅ Флаг “перехода карты” (Angry Birds стиль)
-   * MapPage потом будет читать это и играть анимацию/свайп.
-   */
   const mapTransition = ref({
     active: false,
     from: 1,
     to: 1,
-    // можно использовать в UI (например направление)
     direction: 'right'
   });
 
-  /**
-   * =========================
-   * MAP 1 (твоя текущая карта)
-   * =========================
-   * ОСТАВЛЕНО ПРАКТИЧЕСКИ 1:1
-   */
   const map1Levels = ref([
     { 
       id: 1, 
@@ -601,7 +581,6 @@ for (int i = 0; i < ninjas.length; i++) {
     'Wenn du sauber triffst, lasse ich dich zur nächsten Karte. Wenn nicht… nun ja. 🌸'
   ],
 
-  // Рандомные, как атмосферный шум (остаются)
   taunts: [
     'Das war… fast Code. Wirklich fast.',
     'Dein Stil ist wie ein unbenutzter Import: unnötig.',
@@ -610,7 +589,6 @@ for (int i = 0; i < ninjas.length; i++) {
     'Konzentrier dich. Oder nenn es wenigstens „kreativen Fehler“.'
   ],
 
-  // ✅ ВАЖНО: новые “мгновенные” фразы на событие
   tauntsOnHit: [
     'Hmpf. Ein Treffer. Du lernst ja doch… minimal.',
     'Sauber. Das tut weh. Mach’s noch zweimal.',
@@ -626,13 +604,11 @@ for (int i = 0; i < ninjas.length; i++) {
 
   tasks: [
   {
-    // ✅ 1 строка: объявление переменной
     type: "input",
     question:
       "Phase 1 — Variable:\n" +
       "Deklariere eine int-Variable mit dem Namen score und dem Startwert 10.\n" +
       "Schreibe NUR diese eine Zeile.",
-    // принимает: int score=10; / int score = 10;
     correctRegex: /^\s*int\s+score\s*=\s*10\s*;?\s*$/m,
     hint:
       "Tipp: Datentyp, Name, Gleichzeichen, Wert.",
@@ -641,12 +617,10 @@ for (int i = 0; i < ninjas.length; i++) {
   },
 
   {
-    // ✅ 1 строка: if-Bedingung (без тела)
     type: "input",
     question:
       "Phase 2 — Bedingung:\n" +
       "Schreibe NUR die Bedingung (ohne if), die true ist, wenn hp kleiner oder gleich 0 ist.",
-    // принимает: hp<=0 / hp <= 0
     correctRegex: /^\s*\(?\s*hp\s*<=\s*0\s*\)?\s*;?\s*$/m,
     hint:
       "Tipp: „kleiner oder gleich“ ist <= .",
@@ -655,13 +629,11 @@ for (int i = 0; i < ninjas.length; i++) {
   },
 
   {
-    // ✅ 1 строка: for-loop header
     type: "input",
     question:
       "Phase 3 — Schleife:\n" +
       "Schreibe NUR den for-Header, der i von 1 bis 3 laufen lässt.\n" +
       "(Also: i startet bei 1 und endet bei 3.)",
-    // принимает: for(int i=1;i<=3;i++) / for (int i = 1; i <= 3; i++)
     correctRegex: /^\s*for\s*\(\s*int\s+i\s*=\s*1\s*;\s*i\s*<=\s*3\s*;\s*i\s*\+\+\s*\)\s*;?\s*$/m,
     hint:
       "Tipp: Start 1, Bedingung <= 3, Schritt i++.",
@@ -676,16 +648,7 @@ for (int i = 0; i < ninjas.length; i++) {
     },
   ]);
 
-  /**
-   * =========================
-   * MAP 2 (НОВАЯ КАРТА)
-   * =========================
-   */
   const map2Levels = ref(createMap2Levels());
-
-  /**
-   * ✅ Открыта ли карта 2 (для выбора карты вручную)
-   */
   const map2Unlocked = computed(() => {
     const first = map2Levels.value?.find(l => l.id === 1);
     return !!first?.unlocked;

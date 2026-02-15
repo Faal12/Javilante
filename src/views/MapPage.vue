@@ -1,8 +1,8 @@
-<!-- src/views/MapPage.vue -->
+
 <template>
   <div class="viewport" ref="viewportRef">
     
-    <!-- ✅ Improved Cloud Transition: from BOTH sides, cover -> switch -> split reveal -->
+
     <div
       class="map-transition"
       :class="{
@@ -55,7 +55,6 @@
       </defs>
     </svg>
 
-    <!-- ✅ HUD moved to bottom -->
     <div class="hud hud-bottom">
       <div class="hud-left">
         <div class="hud-panel star-panel">
@@ -65,7 +64,6 @@
           <span class="hud-text">{{ store.totalStars }}</span>
         </div>
 
-        <!-- ✅ Map selector: always available (Map2 only if unlocked) -->
         <div class="hud-panel map-switch">
           <button
             class="map-btn"
@@ -98,7 +96,6 @@
           <span class="percent-text">{{ store.progressPercent }}%</span>
         </div>
 
-        <!-- ✅ small active map indicator -->
         <div class="hud-panel map-pill">
           <span class="map-dot" :class="{ m2: store.currentMapId === 2 }"></span>
           <span class="hud-text small">{{ mapTitle }}</span>
@@ -116,8 +113,7 @@
       :style="worldStyle"
       :class="{ 'disable-input': overlayActive }"
     >
-      <!-- ✅ Background: Map1 uses bg1, Map2 currently fallback to bg1.
-           When you add your Map2 image, just uncomment the import + use bgUrlMap2 below. -->
+
       <div class="world-bg" :class="mapThemeClass" :style="{ backgroundImage: `url(${activeBgUrl})` }"></div>
 
       <svg class="connections" :width="MAP_WIDTH" :height="MAP_HEIGHT">
@@ -288,7 +284,6 @@ const pandaStyle = computed(() => ({
   zIndex: 100
 }));
 
-/* === SMART MOVEMENT === */
 const handleNodeClick = (level) => {
   if (overlayActive.value) return;
   if (isMoving.value) return;
@@ -374,7 +369,6 @@ const checkAndEnterLevel = (level) => {
   }
 };
 
-/* === DRAG === */
 let isDragging = false;
 let startX = 0, startY = 0, initialPX = 0, initialPY = 0;
 
@@ -403,13 +397,10 @@ const stopDrag = () => {
   store.setCamera(pX.value, pY.value);
 };
 
-/* === MAP SWITCHER === */
 function switchMap(id) {
   if (overlayActive.value) return;
   if (typeof store.requestMapSwitch === 'function') store.requestMapSwitch(id);
 }
-
-/* === NEW TRANSITION LOGIC (cover -> switch mid -> reveal) === */
 const overlayActive = ref(false);
 const overlayDirection = ref('right');
 const overlayHandled = ref(false);
@@ -417,25 +408,15 @@ let midSwitchTimer = null;
 
 const runMapTransitionIfNeeded = async () => {
   overlayHandled.value = false;
-
-  // stop panda movement
   isMoving.value = false;
   isPandaWalking.value = false;
   moveQueue.value = [];
 
-  // Show overlay now (animation runs in CSS)
   overlayActive.value = true;
-
-  // Switch map exactly when clouds fully cover screen (mid-point)
   clearTimeout(midSwitchTimer);
   midSwitchTimer = setTimeout(async () => {
-    // if transition was canceled — do nothing
     if (!store.mapTransition?.active) return;
-
-    // ✅ switch map in store while screen is covered
     store.finishMapTransition();
-
-    // ✅ re-init panda/camera for new map
     await nextTick();
     initPanda();
     await nextTick();
@@ -447,7 +428,6 @@ const runMapTransitionIfNeeded = async () => {
 };
 
 const onOverlayAnimationEnd = () => {
-  // animation ends after cover+reveal
   if (overlayHandled.value) return;
   overlayHandled.value = true;
 
@@ -467,7 +447,6 @@ watch(
 watch(
   () => store.currentMapId,
   async () => {
-    // safety re-init if map changes in future by other ways
     await nextTick();
     initPanda();
     await nextTick();
@@ -509,7 +488,6 @@ onUnmounted(() => {
   font-family: 'Fredoka', sans-serif;
 }
 
-/* === TRANSITION OVERLAY: two-sided cover -> split reveal === */
 .map-transition {
   position: fixed;
   inset: 0;
@@ -526,7 +504,6 @@ onUnmounted(() => {
   background: radial-gradient(circle at 50% 40%, rgba(255,255,255,0.92), rgba(255,255,255,0.65), rgba(255,255,255,0.0));
 }
 
-/* packs */
 .cloud-pack {
   position: absolute;
   top: 0;
@@ -544,7 +521,6 @@ onUnmounted(() => {
   animation: cloudCoverSplit 1200ms cubic-bezier(0.25, 0.8, 0.2, 1) forwards;
 }
 
-/* Cover at ~45-60%, then split out */
 @keyframes cloudCoverSplit {
   0%   { transform: translateX(var(--start, 0)); }
   45%  { transform: translateX(0%); }
@@ -579,13 +555,11 @@ onUnmounted(() => {
 .cloud::before { width: 240px; height: 170px; left: 40px; top: -45px; }
 .cloud::after  { width: 190px; height: 150px; left: 220px; top: -25px; }
 
-/* left pack clouds */
 .cloud-1 { top: 10%; left: 6%; transform: scale(1.15); }
 .cloud-2 { top: 30%; left: 18%; transform: scale(0.95); }
 .cloud-3 { top: 54%; left: 8%; transform: scale(1.2); }
 .cloud-4 { top: 72%; left: 20%; transform: scale(1.05); }
 
-/* right pack clouds */
 .cloud-5 { top: 12%; right: 6%; transform: scale(1.2); }
 .cloud-6 { top: 34%; right: 18%; transform: scale(0.95); }
 .cloud-7 { top: 56%; right: 10%; transform: scale(1.25); }
@@ -627,7 +601,6 @@ onUnmounted(() => {
 .stamp-title { font-weight: 800; font-size: 1.05rem; line-height: 1.15; }
 .stamp-sub { margin-top: 6px; opacity: 0.85; font-weight: 700; }
 
-/* === HUD (BOTTOM) === */
 .hud {
   position: absolute;
   z-index: 90;
@@ -714,7 +687,6 @@ onUnmounted(() => {
 }
 @keyframes shineLoad { from {transform: translateX(-100%);} to {transform: translateX(100%);} }
 
-/* map switch buttons */
 .map-switch { gap: 8px; }
 .map-btn {
   border: 1px solid rgba(255,255,255,0.18);
@@ -748,7 +720,6 @@ onUnmounted(() => {
   .map-btn { padding: 6px 10px; font-size: 0.9rem; }
 }
 
-/* === WORLD === */
 .game-world {
   position: absolute;
   cursor: grab;
@@ -769,14 +740,10 @@ onUnmounted(() => {
   z-index: 0;
 }
 
-/* (оставил твою стилизацию map2 как временную, пока не добавишь картинку) */
-
-
-/* Connections */
 .connections { position: absolute; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
 .path-line { stroke: #fff; stroke-width: 8; stroke-linecap: round; fill: none; opacity: 0; stroke-dasharray: 15, 20; filter: drop-shadow(0 4px 4px rgba(0,0,0,0.5)); }
 
-/* Nodes */
+
 .level-node {
   position: absolute;
   width: 100px; height: 70px;

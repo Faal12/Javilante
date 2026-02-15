@@ -30,7 +30,6 @@
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue';
 
-// === ЛОГИКА ЛЕПЕСТКОВ (Без изменений) ===
 const petals = ref([]);
 const initPetals = () => {
   const newPetals = [];
@@ -50,7 +49,6 @@ const initPetals = () => {
   petals.value = newPetals;
 };
 
-// === ЛОГИКА ПЕЧАТНОЙ МАШИНКИ (Без изменений) ===
 const phrases = ["Javilante", "The best way to learn Java"];
 const displayText = ref(""); 
 let phraseIndex = 0; 
@@ -113,48 +111,44 @@ onUnmounted(() => {
   max-width: 800px;
 }
 
-/* === НОВЫЕ СТИЛИ ДЛЯ ЛОГО И ДЫМА === */
 .logo-container {
   position: relative;
-  width: 250px; /* Настрой ширину под размер своего лого */
+  width: 250px;
   height: 250px;
   margin-bottom: 30px;
   display: flex;
   justify-content: center;
-  align-items: flex-end; /* Логотип стоит внизу */
+  align-items: flex-end;
 }
 
 .logo-img {
   width: 150%;
   height: auto;
   position: relative;
-  z-index: 5; /* Лого поверх дыма */
+  z-index: 5;
   filter: drop-shadow(0 10px 15px rgba(0,0,0,0.3));
   animation: floatLogo 4s ease-in-out infinite;
 }
 
 .smoke-img {
   position: absolute;
-  /* Настрой эти значения, чтобы дым выходил из нужного места логотипа */
   bottom: 100%; 
   left: 35%;
-  width: 180px; /* Размер дыма */
+  width: 180px;
   height: auto;
-  transform-origin: bottom center; /* Качается от основания */
+  transform-origin: bottom center;
   transform: translateX(-50%);
   opacity: 0.8;
-  z-index: 6; /* Дым позади логотипа (или поставь 6, если нужен спереди) */
+  z-index: 6;
   animation: smokeSway 5s ease-in-out infinite;
   pointer-events: none;
 }
 
-/* Анимация логотипа: легкое парение вверх-вниз */
 @keyframes floatLogo {
   0%, 100% { transform: translateY(0); }
   50% { transform: translateY(-10px); }
 }
 
-/* Анимация дыма: покачивание и изменение прозрачности */
 @keyframes smokeSway {
   0% { 
     transform: translateX(-50%) rotate(-5deg) scale(0.9); 
@@ -170,7 +164,6 @@ onUnmounted(() => {
   }
 }
 
-/* === СТИЛИ ЗАГОЛОВКА === */
 .main-title {
   font-size: 3.5rem; 
   font-weight: 900;
@@ -181,7 +174,6 @@ onUnmounted(() => {
   line-height: 1.2;
 }
 
-/* === КУРСОР === */
 .cursor {
   display: inline-block;
   width: 3px;
@@ -206,7 +198,6 @@ onUnmounted(() => {
 
 .subtitle { font-size: 1.6rem; color: #5d4037; margin: 25px 0 45px; font-weight: 700; }
 
-/* --- ТЕКСТ КНОПКИ --- */
 .start-btn { 
   padding: 18px 45px; background: #FFD700; color: #4e342e; text-decoration: none; font-size: 1.6rem; font-weight: 900;
   border-radius: 50px; border: 5px solid #fff; box-shadow: 0 10px 0 #cba108, 0 20px 30px rgba(0,0,0,0.3);
@@ -215,7 +206,6 @@ onUnmounted(() => {
 .start-btn:hover { transform: scale(1.05) translateY(-5px); background: #ffe066; }
 .start-btn:active { transform: translateY(5px); box-shadow: 0 0 0 #cba108; }
 
-/* --- ФОН --- */
 .decor-bg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
 .petal {
   position: absolute; left: var(--left-start); top: -10%; width: calc(20px * var(--scale)); height: calc(20px * var(--scale));

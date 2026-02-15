@@ -1,5 +1,3 @@
-// src/data/map2Levels.js
-// Map 2: Objektorientierung – Fokus auf Klassen & Objekte (ohne Vererbung/Kapselung, nur minimal erwähnt)
 
 export function createMap2Levels() {
   return [
@@ -625,13 +623,11 @@ public class Main {
 
   tasks: [
   {
-    // ✅ 1 строка: выражение
     type: "input",
     question:
       "Phase 1 — Array-Index:\n" +
       "Gegeben: int[] a = {2, 4, 6};\n" +
       "Schreibe NUR den Ausdruck, der das letzte Element liefert.",
-    // принимает: a[a.length-1] / a[a.length - 1] / (a[a.length-1]) и т.п.
     correctRegex: /^\s*\(?\s*a\s*\[\s*a\s*\.\s*length\s*-\s*1\s*\]\s*\)?\s*;?\s*$/m,
     hint:
       "Tipp: Das letzte Element steht an Index length-1.",
@@ -640,7 +636,6 @@ public class Main {
   },
 
   {
-    // ✅ 1 строка: boolean-условие
     type: "input",
     question:
       "Phase 2 — Gerade Zahl:\n" +
@@ -653,14 +648,11 @@ public class Main {
   },
 
   {
-    // ✅ 1 строка: конструктор (минимум)
     type: "input",
     question:
       "Phase 3 — OOP Konstruktor:\n" +
       "In einer Klasse Ninja gibt es ein Feld: String name;\n" +
       "Schreibe NUR die Zeile im Konstruktor, die den Parameter name ins Feld speichert.",
-    // принимает: this.name=name; / this.name = name; / name = name; (но лучше this.name)
-    // Я оставлю строго: this.name = name; чтобы не было тупого name=name;
     correctRegex: /^\s*this\s*\.\s*name\s*=\s*name\s*;?\s*$/m,
     hint:
       "Tipp: Mit this unterscheidest du Feld und Parameter.",

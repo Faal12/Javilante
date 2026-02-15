@@ -8,16 +8,13 @@
         <span v-for="n in 20" :key="n" class="firefly" :style="getFireflyStyle(n)"></span>
       </div>
 
-      <!-- общий флеш (и по игроку и по боссу — но тонко) -->
       <div class="crit-flash" :class="{ active: showFlash }"></div>
 
-      <!-- мини «осколки» при попадании -->
       <div v-if="hitBurst" class="hit-burst">
         <span v-for="n in 10" :key="n" class="spark" :style="getSparkStyle(n)"></span>
       </div>
     </div>
 
-    <!-- INTRO -->
     <div v-if="phase === 'intro'" class="intro-layer" @click="advanceDialog">
       <div class="boss-summon-circle">
         <div class="mandala outer"></div>
@@ -43,11 +40,9 @@
       </div>
     </div>
 
-    <!-- FIGHT -->
     <div v-else-if="phase === 'fight'" class="fight-layer">
 
       <div class="battle-hud slide-down">
-        <!-- PLAYER -->
         <div class="player-stats">
           <div class="stat-label">DEINE ENERGIE</div>
           <div class="hearts-container player">
@@ -57,7 +52,6 @@
           </div>
         </div>
 
-        <!-- BOSS HP (3 попадания = 3 сегмента) -->
         <div class="boss-stats">
           <div class="stat-label boss-label">BOSS-ESSENZ</div>
           <div class="hearts-container boss">
@@ -70,7 +64,7 @@
           </div>
         </div>
 
-        <!-- TIMER -->
+
         <div class="boss-timer" :class="{ critical: timeLeft < 20 }">
           <div class="timer-ring">
             <svg viewBox="0 0 100 100">
@@ -95,12 +89,10 @@
         </transition>
 
         <div class="boss-container">
-          <!-- projectile -->
           <transition name="projectile-fly">
             <div v-if="isAttacking" class="magic-projectile">🔥</div>
           </transition>
 
-          <!-- floating damage number -->
           <transition name="float-pop">
             <div v-if="floatingDmg" class="floating-dmg">-1</div>
           </transition>
@@ -149,7 +141,6 @@
 
     </div>
 
-    <!-- RESULT -->
     <div v-else class="result-layer">
       <div class="victory-seal pop-in" :class="phase">
         <div class="seal-icon">{{ phase === 'win' ? '🏆' : '💀' }}</div>
@@ -173,10 +164,8 @@ const props = defineProps({
   bossData: { type: Object, required: true }
 });
 
-// ВАЖНО: поддерживаем оба варианта, чтобы твой LevelPage с @win работал
 const emit = defineEmits(['level-completed', 'win']);
 
-// ====== STATE ======
 const phase = ref('intro');
 
 const lives = ref(props.bossData.health || 3);
@@ -193,7 +182,6 @@ const activeTaunt = ref(null);
 
 const isAttacking = ref(false);
 
-// урон/эффекты
 const bossDamaged = ref(false);
 const showFlash = ref(false);
 const floatingDmg = ref(false);
@@ -203,11 +191,10 @@ let timerInterval = null;
 let tauntInterval = null;
 let typeInterval = null;
 
-// ====== TASKS (3 удара) ======
+
 const bossTasks = computed(() => {
-  // новый формат
+
   if (Array.isArray(props.bossData.tasks) && props.bossData.tasks.length) return props.bossData.tasks;
-  // старый формат
   if (props.bossData.task) return [props.bossData.task];
   return [];
 });
@@ -218,13 +205,13 @@ const bossHp = ref(bossMaxHp.value);
 
 const currentBossTask = computed(() => bossTasks.value[taskIndex.value]);
 
-// ====== TIMER ======
+
 const timePercent = computed(() => {
   const total = props.bossData.timeSeconds || 120;
   return (timeLeft.value / total) * 100;
 });
 
-// ====== LIFECYCLE ======
+
 onMounted(() => startDialog());
 onUnmounted(() => clearIntervals());
 
@@ -234,7 +221,7 @@ function clearIntervals() {
   clearInterval(typeInterval);
 }
 
-// ====== VISUAL HELPERS ======
+
 const getFireflyStyle = () => ({
   top: Math.random() * 100 + '%',
   left: Math.random() * 100 + '%',
@@ -254,7 +241,7 @@ const getSparkStyle = (n) => {
   };
 };
 
-// ====== DIALOG ======
+
 function startDialog() {
   if (!props.bossData.dialogues?.length) return startFight();
   typeText(props.bossData.dialogues[0]);
@@ -291,11 +278,9 @@ function advanceDialog() {
   }
 }
 
-// ====== FIGHT ======
 function startFight() {
   phase.value = 'fight';
 
-  // reset
   timeLeft.value = props.bossData.timeSeconds || 120;
   lives.value = props.bossData.health || 3;
   userCode.value = '';
@@ -328,7 +313,6 @@ function showTauntFrom(list, fallbackList = []) {
   setTimeout(() => (activeTaunt.value = null), 2400);
 }
 
-// ====== ATTACK LOGIC ======
 function triggerAttack() {
   if (!userCode.value || !currentBossTask.value?.correctRegex) return;
 
@@ -338,7 +322,7 @@ function triggerAttack() {
   if (isCorrect) {
     isAttacking.value = true;
 
-    // полёт снаряда
+
     setTimeout(() => {
       isAttacking.value = false;
       damageBoss();
@@ -349,7 +333,6 @@ function triggerAttack() {
 }
 
 function damageBoss() {
-  // эффекты попадания
   bossDamaged.value = true;
   showFlash.value = true;
   floatingDmg.value = true;
@@ -357,17 +340,12 @@ function damageBoss() {
 
   if (navigator.vibrate) navigator.vibrate(60);
   showTauntFrom(props.bossData.tauntsOnHit, props.bossData.taunts);
-
-  // снять через короткое время
   setTimeout(() => (bossDamaged.value = false), 260);
   setTimeout(() => (showFlash.value = false), 140);
   setTimeout(() => (floatingDmg.value = false), 520);
   setTimeout(() => (hitBurst.value = false), 420);
 
-  // урон
   bossHp.value = Math.max(0, bossHp.value - 1);
-
-  // следующий шаг
   userCode.value = '';
 
   if (bossHp.value <= 0) {
@@ -375,10 +353,8 @@ function damageBoss() {
     return;
   }
 
-  // следующий удар = следующее простое задание
   taskIndex.value = Math.min(taskIndex.value + 1, bossTasks.value.length - 1);
 
-  // небольшой «ритм» — фокус обратно
   setTimeout(() => inputRef.value?.focus(), 180);
 }
 
@@ -408,7 +384,7 @@ function gameOver() {
 function handleResultAction() {
   if (phase.value === 'win') {
     emit('level-completed');
-    emit('win'); // чтобы твой LevelPage @win работал
+    emit('win');
   } else {
     phase.value = 'intro';
     currentDialogIndex.value = 0;
@@ -432,7 +408,6 @@ function handleResultAction() {
   font-family: 'Cinzel', serif;
 }
 
-/* === ФОН === */
 .mystic-bg {
   position: absolute;
   inset: 0;
@@ -465,7 +440,6 @@ function handleResultAction() {
   animation: fireflyFloat linear infinite;
 }
 
-/* флеш */
 .crit-flash {
   position: absolute;
   inset: 0;
@@ -477,7 +451,6 @@ function handleResultAction() {
 }
 .crit-flash.active { opacity: 0.45; }
 
-/* burst */
 .hit-burst {
   position: absolute;
   left: 50%;
@@ -496,7 +469,6 @@ function handleResultAction() {
   border-radius: 2px;
 }
 
-/* === INTRO === */
 .intro-layer {
   position: absolute;
   inset: 0;
@@ -567,7 +539,6 @@ function handleResultAction() {
   animation: pulse 1.5s infinite; cursor: pointer;
 }
 
-/* === FIGHT === */
 .fight-layer {
   position: relative;
   z-index: 10;
@@ -616,7 +587,6 @@ function handleResultAction() {
   margin-top: 4px;
 }
 
-/* TIMER */
 .boss-timer { position: relative; width: 80px; height: 80px; }
 .timer-ring { width: 100%; height: 100%; position: relative; }
 .timer-ring svg { transform: rotate(-90deg); width: 100%; height: 100%; }
@@ -631,7 +601,6 @@ function handleResultAction() {
   font-family: 'JetBrains Mono'; font-size: 1.5rem; font-weight: bold;
 }
 
-/* ARENA */
 .arena-stage {
   flex: 1;
   display: flex;
@@ -672,7 +641,6 @@ function handleResultAction() {
   z-index: 30;
 }
 
-/* aura */
 .boss-aura-wrapper { position: relative; width: 100%; height: 100%; }
 .aura-waves {
   position: absolute; inset: -20px; border-radius: 50%;
@@ -686,7 +654,6 @@ function handleResultAction() {
   opacity: 0.6; transform: scaleY(0.5);
 }
 
-/* projectile */
 .magic-projectile {
   position: absolute;
   bottom: -100px;
@@ -697,7 +664,6 @@ function handleResultAction() {
   text-shadow: 0 0 20px #ff9900;
 }
 
-/* taunt */
 .boss-taunt {
   position: absolute; top: -40px; left: 50%; transform: translateX(-50%);
   background: rgba(0,0,0,0.8); border: 1px solid #ffd700; color: #ffd700;
@@ -705,7 +671,6 @@ function handleResultAction() {
   box-shadow: 0 0 15px rgba(255, 215, 0, 0.3); white-space: nowrap; z-index: 10;
 }
 
-/* input panel */
 .spell-input {
   width: 100%;
   max-width: 650px;
@@ -756,7 +721,6 @@ function handleResultAction() {
 }
 .hint-line span { color: #fff; opacity: 0.95; }
 
-/* result */
 .result-layer {
   position: absolute; inset: 0; background: rgba(13, 2, 33, 0.95); z-index: 100;
   display: flex; justify-content: center; align-items: center;
@@ -777,7 +741,6 @@ function handleResultAction() {
 }
 .epic-btn:hover { background: #ffd700; color: #000; box-shadow: 0 0 20px #ffd700; }
 
-/* === transitions === */
 .projectile-fly-enter-active, .projectile-fly-leave-active { transition: all 0.6s ease; }
 .projectile-fly-enter-from { transform: translate(-50%, 0); opacity: 0; }
 .projectile-fly-enter-to { transform: translate(-50%, -240px); opacity: 1; }
@@ -789,7 +752,6 @@ function handleResultAction() {
 .float-pop-enter-to { transform: translate(-50%, -90%) scale(1); opacity: 1; }
 .float-pop-leave-to { transform: translate(-50%, -130%) scale(0.8); opacity: 0; }
 
-/* animations */
 @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
 @keyframes spin { to { transform: rotate(360deg); } }
 @keyframes pulse { 50% { opacity: 0.55; } }

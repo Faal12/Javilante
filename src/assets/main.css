@@ -1,14 +1,14 @@
-/* Убираем все стандартные отступы браузера */
+
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
-/* Заставляем HTML и BODY занимать ровно 100% экрана и НИ ПИКСЕЛЕМ БОЛЬШЕ */
+
 html, body, #app {
   width: 100%;
   height: 100%;
-  overflow: hidden; /* <--- САМОЕ ВАЖНОЕ: Запрет скролла браузера */
-  background-color: #5dade2; /* Цвет воды, чтобы при загрузке не мигало белым */
+  overflow: hidden; 
+  background-color: #5dade2;
 }
